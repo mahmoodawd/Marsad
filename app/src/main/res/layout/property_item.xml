@@ -1,0 +1,33 @@
+<GridLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/prob_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|start"
+            android:text="prob Name"
+            android:textAllCaps="true"
+            android:textColor="@color/md_theme_light_onPrimary"
+            android:textStyle="bold"
+            app:drawableStartCompat="@drawable/ic_map_24" />
+
+
+        <TextView
+            android:id="@+id/prob_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|end"
+            android:padding="8dp"
+            android:text="prob value"
+            android:textAlignment="center"
+            android:textColor="@color/md_theme_light_onPrimary"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+
+    </GridLayout>

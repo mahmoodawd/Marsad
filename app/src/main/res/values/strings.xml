@@ -2,4 +2,8 @@
     <string name="app_name">Marsad</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="home">My Location</string>
+    <string name="favorites">Favorite Locations</string>
+    <string name="settings">Settings</string>
+    <string name="weather_alerts">Weather Alerts</string>
 </resources>
