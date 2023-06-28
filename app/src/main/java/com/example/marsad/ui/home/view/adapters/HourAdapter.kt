@@ -4,12 +4,16 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.marsad.data.network.HourlyWeather
 import com.example.marsad.databinding.HourItemBinding
+import com.example.marsad.ui.utils.UnitsUtils
 import com.squareup.picasso.Picasso
+import java.text.SimpleDateFormat
+import java.util.*
 
-data class HourItem(val time: String, val icon: String, val temperature: String)
 
-class HourAdapter(hourList: List<HourItem>) : RecyclerView.Adapter<HourAdapter.ViewHolder>() {
+class HourAdapter(hourList: List<HourlyWeather>, val context: Context) :
+    RecyclerView.Adapter<HourAdapter.ViewHolder>() {
     var hours = hourList
         set(value) {
             notifyDataSetChanged()
@@ -29,9 +33,13 @@ class HourAdapter(hourList: List<HourItem>) : RecyclerView.Adapter<HourAdapter.V
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currentHourItem = hours[position]
-        holder.binding.hourTv.text = currentHourItem.time
-        holder.binding.hourTempTv.text = currentHourItem.temperature
-//        Picasso.get().load(currentHourItem.icon).into(hourItemBinding.hourTempIcon)
+        val hour =
+            SimpleDateFormat("h a", Locale.getDefault()).format(currentHourItem.dt * 1000)
+        val iconUrl = "https://openweathermap.org/img/wn/${currentHourItem.weather[0].icon}@2x.png"
+        holder.binding.hourTv.text = hour
+        holder.binding.hourTempTv.text =
+            UnitsUtils.getTempRepresentation(context, currentHourItem.temp, false)
+        Picasso.get().load(iconUrl).into(hourItemBinding.hourTempIcon)
     }
 
     override fun getItemCount(): Int = hours.size

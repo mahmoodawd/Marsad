@@ -1,8 +1,8 @@
 package com.example.marsad.data.repositories
 
 import com.example.marsad.data.database.LocalSource
+import com.example.marsad.data.network.OneCallResponse
 import com.example.marsad.data.network.RemoteSource
-import com.example.marsad.data.network.WeatherResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -25,8 +25,12 @@ class LocationRepository private constructor(
         }
     }
 
-    override suspend fun getWeatherStatus(lat: String, lon: String): Flow<WeatherResponse> {
+    override suspend fun getWeatherStatus(lat: Double, lon: Double): Flow<OneCallResponse> {
 
-        return flow { emit(remoteSource.getWeatherStatus(lat, lon).body()) }.flowOn(Dispatchers.IO) as Flow<WeatherResponse>
+        return flow {
+            emit(
+                remoteSource.getWeatherStatus(lat, lon).body()
+            )
+        }.flowOn(Dispatchers.IO) as Flow<OneCallResponse>
     }
 }

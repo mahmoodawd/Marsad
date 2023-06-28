@@ -83,15 +83,27 @@
                 android:textColor="@color/md_theme_light_onPrimary"
                 android:textSize="18sp" />
 
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/feels_like_tv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Feels Like Tempe"
-                android:textAlignment="textEnd"
-                android:textColor="@color/md_theme_light_onPrimary"
-                android:textSize="14sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@id/feels_like_tv"
+                    android:text="@string/feels_like"
+                    android:textColor="@color/md_theme_light_onPrimary"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/feels_like_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/feels_like"
+                    android:textAlignment="textEnd"
+                    android:textColor="@color/md_theme_light_onPrimary"
+                    android:textSize="14sp" />
+            </RelativeLayout>
 
         </LinearLayout>
 

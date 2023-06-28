@@ -11,6 +11,7 @@ import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
 import com.example.marsad.R
 import com.example.marsad.databinding.ActivityMainBinding
+import com.example.marsad.ui.utils.UnitsUtils
 
 class MainActivity : AppCompatActivity() {
     lateinit var activityMainBinding: ActivityMainBinding
@@ -23,7 +24,7 @@ class MainActivity : AppCompatActivity() {
 
         val actionBar = supportActionBar
         actionBar?.apply {
-            title = ""
+            title = UnitsUtils.getTempRepresentation(applicationContext, 36.0)
             setHomeAsUpIndicator(R.drawable.ic_list_24)
             setDisplayHomeAsUpEnabled(true)
         }

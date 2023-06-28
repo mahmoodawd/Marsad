@@ -6,11 +6,12 @@ import retrofit2.http.Query
 
 interface ApiService {
 
-    @GET("forecast")
+    @GET("onecall")
     suspend fun getWeatherDetails(
-        @Query("lat") lat: String,
-        @Query("lon") lon: String,
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
         @Query("appid") apiKey: String,
-        @Query("units") units:String
-    ): Response<WeatherResponse>
+        @Query("units") units: String,
+        @Query("exclude") exclude: String
+    ): Response<OneCallResponse>
 }

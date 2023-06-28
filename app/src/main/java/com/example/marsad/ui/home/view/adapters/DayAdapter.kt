@@ -4,11 +4,18 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.marsad.data.network.DailyWeather
 import com.example.marsad.databinding.DayLayoutBinding
+import com.example.marsad.ui.utils.UnitsUtils
+import com.squareup.picasso.Picasso
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZoneId
+import java.util.*
 
-data class DayItem(val title: String, val icon: String, val temperature: String)
 
-class DayAdapter(dayItems: List<DayItem>) : RecyclerView.Adapter<DayAdapter.ViewHolder>() {
+class DayAdapter(dayItems: List<DailyWeather>, val context: Context) :
+    RecyclerView.Adapter<DayAdapter.ViewHolder>() {
     var days = dayItems
         set(value) {
             notifyDataSetChanged()
@@ -28,8 +35,20 @@ class DayAdapter(dayItems: List<DayItem>) : RecyclerView.Adapter<DayAdapter.View
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currentDayItem = days[position]
-        holder.binding.dayTv.text = currentDayItem.title
-        holder.binding.tempTv.text = currentDayItem.temperature
+        val dayOfWeek =
+            SimpleDateFormat("EEEE", Locale.getDefault()).format(currentDayItem.dt * 1000)
+        val iconUrl = "https://openweathermap.org/img/wn/${currentDayItem.weather[0].icon}@2x.png"
+        val minTemp = UnitsUtils.getTempRepresentation(
+            context,
+            currentDayItem.temp.day, false
+        )
+        val maxTemp = UnitsUtils.getTempRepresentation(
+            context,
+            currentDayItem.temp.night
+        )
+        holder.binding.dayTv.text = dayOfWeek
+        holder.binding.tempTv.text = StringBuilder().append(minTemp, "/", maxTemp)
+        Picasso.get().load(iconUrl).into(holder.binding.weatherIcon)
     }
 
     override fun getItemCount() = days.size
