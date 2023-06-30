@@ -15,11 +15,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.marsad.R
@@ -69,7 +71,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        geocoder = Geocoder(requireContext(), Locale.getDefault())
+        geocoder = Geocoder(requireContext(), UnitsUtils.getCurrentLocale())
         fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireContext())
         fragmentHomeBinding = FragmentHomeBinding.inflate(inflater, container, false)
@@ -83,6 +85,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         homeContent = view.findViewById(R.id.home_content)
 
         fragmentHomeBinding.requestLocationView.grantBtn.setOnClickListener {
+            requestLocationView.visibility = View.GONE
             requestLocationPermissions()
         }
         fragmentHomeBinding.mapView.confrimFab.setOnClickListener {
@@ -92,6 +95,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             homeViewModel.getWeatherStatus(lat, lon)
             isFirstUse = false
             isHaveLocation = true
+            val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+            prefs.edit().putString(getString(R.string.pref_location_method_key), "map").apply()
+            updateSharedPrefs()
         }
         val mapFragment =
             childFragmentManager.findFragmentById(R.id.googleMapView) as SupportMapFragment
@@ -131,18 +137,20 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         lat =
             sharedPreferences.getString(
                 getString(R.string.latitude_key),
-                DEFAULT_LATITUDE.toString()
+                null
             )
-                ?.toDouble() ?: DEFAULT_LATITUDE
+                ?.toDouble() ?: 0.0
 
         lon =
             sharedPreferences.getString(
                 getString(R.string.longitude_key),
-                DEFAULT_LONGITUDE.toString()
+                null
             )
-                ?.toDouble() ?: DEFAULT_LONGITUDE
+                ?.toDouble() ?: 0.0
 
         isFirstUse = sharedPreferences.getBoolean(getString(R.string.first_use_key), true)
+        println("####isFirstUse: $isFirstUse")
+
         isHaveLocation =
             sharedPreferences.getBoolean(getString(R.string.is_having_location_key), false)
     }
@@ -172,7 +180,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             )
         )
         homeViewModel = ViewModelProvider(this, homeViewModelFactory)[HomeViewModel::class.java]
-        homeViewModel.getWeatherStatus(lat, lon)
+        if (lat != 0.0 && lon != 0.0) {
+            homeViewModel.getWeatherStatus(lat, lon)
+        }
     }
 
     private fun collectWeatherData() {
@@ -209,9 +219,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 val address =
                     geocoder.getFromLocation(weatherStatus.lat, weatherStatus.lon, 1)?.get(0)
                 cityTv.text = StringBuilder().append(
-                    address?.countryCode, ", ", address?.subAdminArea
+                    address?.countryName, ", ", address?.locality ?: ""
                 )
-
 
                 val iconUrl =
                     "https://openweathermap.org/img/wn/${currentDayWeather.weather[0].icon}@4x.png"
@@ -220,7 +229,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 tempTv.text = java.lang.StringBuilder().append(
                     UnitsUtils.getTempRepresentation(requireContext(), it.temp)
                 )
-                weatherConditionTv.text = it.weather?.get(0)?.main
+                weatherConditionTv.text = it.weather?.get(0)?.description
 
                 val minTemp = UnitsUtils.getTempRepresentation(
                     requireContext(),
@@ -247,19 +256,21 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                     humidity.probName.text = getString(R.string.humidity)
                     humidity.probIcon.setImageResource(R.drawable.ic_water_drop_24)
                     humidity.probValue.text = StringBuilder().append(
-                        it.humidity.toString(), getString(R.string.percentageSymbol)
+                        UnitsUtils.localizeNumber(it.humidity), getString(R.string.percentageSymbol)
                     )
 
                     pressure.probName.text = getString(R.string.pressure)
                     pressure.probIcon.setImageResource(R.drawable.ic_compress_24)
                     pressure.probValue.text = StringBuilder().append(
-                        it.pressure.toString(), " ", getString(R.string.weather_unit)
+                        UnitsUtils.localizeNumber(it.pressure),
+                        " ",
+                        getString(R.string.weather_unit)
                     )
 
                     clouds.probName.text = getString(R.string.clouds)
                     clouds.probIcon.setImageResource(R.drawable.ic_cloud_24)
                     clouds.probValue.text = StringBuilder().append(
-                        it.clouds.toString(), getString(R.string.percentageSymbol)
+                        UnitsUtils.localizeNumber(it.clouds), getString(R.string.percentageSymbol)
                     )
 
                     windSpeed.probName.text = getString(R.string.wind_speed)
@@ -286,11 +297,26 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         super.onResume()
         Log.i("HomeFragment", "onResume: Get Called")
         getLastLocation()
-
     }
 
     private fun getLastLocation() {
-        if (isFirstUse) {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val prefLocationMethod = prefs.getString("locationMethod", null)
+        when (prefLocationMethod) {
+            "map" -> {
+                if (isFirstUse) displayMap()
+                else return
+            }
+            "gps" -> {
+                if (isLocationPermissionsGranted()) {
+                    getLocationUsingGPS()
+                } else {
+                    requestLocationPermissions()
+                }
+            }
+            else -> showDialog()
+        }
+        /*if (isFirstUse) {
             showDialog()
         } else {
             if (isLocationPermissionsGranted()) {
@@ -305,7 +331,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                     }
                 }
             }
-        }
+        }*/
     }
 
     private fun showDialog() {
@@ -371,7 +397,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION
             ), My_LOCATION_PERMISSION_ID
         )
-        isFirstUse = false
+        val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        prefs.edit().putString(getString(R.string.pref_location_method_key), "gps").apply()
     }
 
     private fun isLocationEnabled(): Boolean {
@@ -413,7 +440,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 lat = it.latitude
                 lon = it.longitude
             }
-            isFirstUse = false
             isHaveLocation = true
             homeViewModel.getWeatherStatus(lat, lon)
         }

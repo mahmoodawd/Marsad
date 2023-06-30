@@ -3,6 +3,7 @@ package com.example.marsad.ui.home.view.adapters
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.recyclerview.widget.RecyclerView
 import com.example.marsad.data.network.DailyWeather
 import com.example.marsad.databinding.DayLayoutBinding
@@ -36,7 +37,7 @@ class DayAdapter(dayItems: List<DailyWeather>, val context: Context) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currentDayItem = days[position]
         val dayOfWeek =
-            SimpleDateFormat("EEEE", Locale.getDefault()).format(currentDayItem.dt * 1000)
+            SimpleDateFormat("EEEE", UnitsUtils.getCurrentLocale()).format(currentDayItem.dt * 1000)
         val iconUrl = "https://openweathermap.org/img/wn/${currentDayItem.weather[0].icon}@2x.png"
         val minTemp = UnitsUtils.getTempRepresentation(
             context,

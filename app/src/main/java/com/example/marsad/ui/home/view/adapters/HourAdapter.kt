@@ -3,6 +3,7 @@ package com.example.marsad.ui.home.view.adapters
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.recyclerview.widget.RecyclerView
 import com.example.marsad.data.network.HourlyWeather
 import com.example.marsad.databinding.HourItemBinding
@@ -34,7 +35,7 @@ class HourAdapter(hourList: List<HourlyWeather>, val context: Context) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currentHourItem = hours[position]
         val hour =
-            SimpleDateFormat("h a", Locale.getDefault()).format(currentHourItem.dt * 1000)
+            SimpleDateFormat("h a", UnitsUtils.getCurrentLocale()).format(currentHourItem.dt * 1000)
         val iconUrl = "https://openweathermap.org/img/wn/${currentHourItem.weather[0].icon}@2x.png"
         holder.binding.hourTv.text = hour
         holder.binding.hourTempTv.text =

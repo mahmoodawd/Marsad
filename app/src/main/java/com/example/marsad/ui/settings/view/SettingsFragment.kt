@@ -1,61 +1,78 @@
-
 package com.example.marsad.ui.settings.view
 
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
 import com.example.marsad.R
+import com.example.marsad.ui.MainActivity
+import java.util.Locale
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+class SettingsFragment : PreferenceFragmentCompat(),
+    SharedPreferences.OnSharedPreferenceChangeListener {
 
-/**
- * A simple [Fragment] subclass.
- * Use the [SettingsFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class SettingsFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        setPreferencesFromResource(R.xml.root_preferences, rootKey)
+        PreferenceManager.setDefaultValues(requireContext(), R.xml.root_preferences, true)
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key == getString(R.string.language_key)) {
+            val currentLocale = sharedPreferences?.getString(key, "english")
+            setLocale(currentLocale)
+        } else if (key == getString(R.string.pref_location_method_key)) {
+            val method = sharedPreferences?.getString(key, null)
+            setPrefMethod(method)
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_settings, container, false)
+    private fun setPrefMethod(method: String?) {
+        when (method) {
+            "gps" -> {
+                val intent = Intent(requireContext(), MainActivity::class.java)
+                startActivity(intent)
+                requireActivity().finish()
+            }
+            "map" -> {
+                val sharedPreferences = activity?.getSharedPreferences(
+                    getString(R.string.preferences_file_key), Context.MODE_PRIVATE
+                ) ?: return
+                with(sharedPreferences.edit()) {
+                    putBoolean(getString(R.string.first_use_key), true)
+                    putString(getString(R.string.latitude_key), "0.0")
+                    putString(getString(R.string.longitude_key), "0.0")
+                        .apply()
+                }
+                val intent = Intent(requireContext(), MainActivity::class.java)
+                startActivity(intent)
+                requireActivity().finish()
+            }
+        }
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment SettingsFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            SettingsFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    private fun setLocale(currentLocale: String?) {
+        val langTag = when (currentLocale) {
+            "arabic" -> "ar-eg"
+            else -> "en-us"
+        }
+        val locale = LocaleListCompat.forLanguageTags(langTag)
+        AppCompatDelegate.setApplicationLocales(locale)
     }
+
+
+    override fun onStart() {
+        super.onStart()
+        preferenceScreen.sharedPreferences?.registerOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        preferenceScreen.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(this)
+
+    }
+
 }

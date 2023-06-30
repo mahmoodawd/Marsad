@@ -1,40 +1,66 @@
-<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_columnSpan="3"
-    android:padding="8dp"
-    android:orientation="horizontal">
+    android:padding="8dp">
+
 
     <ImageView
         android:id="@+id/prob_icon"
-        android:layout_marginEnd="4dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center|start"
-        android:src="@drawable/ic_map_24"/>
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:src="@drawable/ic_map_24"
+        app:layout_constraintEnd_toStartOf="@+id/prob_name"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/prob_name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center|start"
         android:text="prob Name"
         android:textAllCaps="true"
         android:textColor="@color/md_theme_light_onPrimary"
-        android:textStyle="bold" />
-
+        android:textStyle="bold"
+        app:layout_constraintBaseline_toBaselineOf="@+id/prob_value"
+        app:layout_constraintEnd_toStartOf="@+id/prob_value"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/prob_icon" />
 
     <TextView
         android:id="@+id/prob_value"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center|end"
         android:padding="8dp"
         android:text="prob value"
-        android:textAlignment="center"
+        android:textAlignment="textEnd"
         android:textColor="@color/md_theme_light_onPrimary"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/prob_name"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.04" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.9659367" />
 
 
-</GridLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

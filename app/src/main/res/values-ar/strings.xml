@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">مرصد</string>
+    <string name="home">الرئيسية</string>
+    <string name="favorites">المفضلة</string>
+    <string name="settings">الإعدادات</string>
+    <string name="weather_alerts">التنبيهات</string>
+    <string name="pressure">الضغط</string>
+    <string name="humidity">الرطوبة</string>
+    <string name="clouds">نسبة الغيوم</string>
+    <string name="wind_speed">سرعة الرياح</string>
+    <string name="meter_sec">متر/ثانية</string>
+    <string name="miles_hour">ميل/ساعة</string>
+    <string name="sunrise">الشروق</string>
+    <string name="sunset">الغروب</string>
+    <string name="celsius_suffix">°م</string>
+    <string name="permission_msg">للحصول على معلومات الطقس يجب إعطائنا الأذونات اللازمة، اصغط على الذر أدناه لإعطائنا إذن الحصول على الموقع</string>
+    <string name="grant">تنفيذ</string>
+    <string name="confirm_location">تأكيد</string>
+    <string name="weather_unit">باسكال</string>
+    <string name="units">وحدات القياس</string>
+    <string name="temperature">درجة الحرارة</string>
+    <string name="celsius">مئوية</string>
+    <string name="kelvin">كلفن</string>
+    <string name="fahrenheit">فهرانهايت</string>
+    <string name="notification_header">الإشعارات</string>
+    <string name="notification_title">تفعيل الإشعارات</string>
+    <string name="general">عامة</string>
+    <string name="location_method">طريقة تحديد الموقع</string>
+    <string name="map">الخريطة</string>
+    <string name="gps">نظام تحديد المواقع</string>
+    <string name="language">اللغة</string>
+    <string name="english">الإنجليزية</string>
+    <string name="arabic">العربية</string>
+    <string name="feels_like">تبدو</string>
+    <string name="fahrenheit_suffix">°</string>
+    <string name="kelvin_suffix">°</string>
+</resources>
