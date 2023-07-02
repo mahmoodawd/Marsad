@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Geocoder
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
@@ -15,7 +14,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.fragment.app.Fragment
@@ -32,7 +30,7 @@ import com.example.marsad.databinding.FragmentHomeBinding
 import com.example.marsad.ui.home.view.adapters.DayAdapter
 import com.example.marsad.ui.home.view.adapters.HourAdapter
 import com.example.marsad.ui.home.viewmodel.HomeViewModel
-import com.example.marsad.ui.home.viewmodel.LocationViewModelFactory
+import com.example.marsad.ui.home.viewmodel.MyViewModelFactory
 import com.example.marsad.ui.utils.UnitsUtils
 import com.example.marsad.ui.utils.getFullDateAndTime
 import com.example.marsad.ui.utils.getHour
@@ -65,13 +63,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     lateinit var homeViewModel: HomeViewModel
     lateinit var hourAdapter: HourAdapter
     lateinit var dayAdapter: DayAdapter
-    lateinit var geocoder: Geocoder
     lateinit var mMap: GoogleMap
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        geocoder = Geocoder(requireContext(), UnitsUtils.getCurrentLocale())
         fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireContext())
         fragmentHomeBinding = FragmentHomeBinding.inflate(inflater, container, false)
@@ -174,9 +170,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setupViewModel() {
-        val homeViewModelFactory = LocationViewModelFactory(
+        val homeViewModelFactory = MyViewModelFactory(
             LocationRepository.getInstance(
-                LocationRemoteDataSource, LocationLocalDataSource()
+                LocationRemoteDataSource, LocationLocalDataSource(requireContext())
             )
         )
         homeViewModel = ViewModelProvider(this, homeViewModelFactory)[HomeViewModel::class.java]
@@ -187,16 +183,16 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     private fun collectWeatherData() {
         lifecycleScope.launch {
-            homeViewModel.postStateFlow.collect { result ->
+            homeViewModel.weatherDataStateFlow.collect { result ->
                 when (result) {
                     is ApiState.Loading -> {
                         fragmentHomeBinding.loadingBar.visibility = View.VISIBLE
                         Toast.makeText(requireContext(), "Fetching......", Toast.LENGTH_LONG).show()
                     }
-                    is ApiState.Success -> {
+                    is ApiState.Success<*> -> {
                         fragmentHomeBinding.loadingBar.visibility = View.GONE
                         homeContent.visibility = View.VISIBLE
-                        buildViews(result.weatherStatus)
+                        buildViews(result.weatherStatus as OneCallResponse)
                     }
                     else -> {
                         fragmentHomeBinding.loadingBar.visibility = View.GONE
@@ -216,11 +212,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
         currentDayView.apply {
             currentDayWeather?.let {
-                val address =
-                    geocoder.getFromLocation(weatherStatus.lat, weatherStatus.lon, 1)?.get(0)
-                cityTv.text = StringBuilder().append(
-                    address?.countryName, ", ", address?.locality ?: ""
-                )
+
+                cityTv.text =
+                    UnitsUtils.getCity(requireContext(), weatherStatus.lat, weatherStatus.lon)
 
                 val iconUrl =
                     "https://openweathermap.org/img/wn/${currentDayWeather.weather[0].icon}@4x.png"
@@ -335,16 +329,16 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun showDialog() {
-        MaterialAlertDialogBuilder(requireContext()).setTitle("Choose Method")
+        MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.location_method))
             .setIcon(R.drawable.ic_launcher_foreground)
-            .setMessage("Use GPS to automatically get your location or pick one from the map")
-            .setNeutralButton("Map") { dialog, which ->
+            .setMessage(getString(R.string.dialog_msg))
+            .setNeutralButton(getString(R.string.map)) { dialog, which ->
                 displayMap()
             }
             .setNeutralButtonIcon(
                 getDrawable(requireContext(), R.drawable.ic_map_24)
             )
-            .setPositiveButton("GPS") { dialog, which ->
+            .setPositiveButton(getString(R.string.gps)) { dialog, which ->
                 requestLocationPermissions()
             }
             .setPositiveButtonIcon(

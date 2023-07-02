@@ -1,12 +1,20 @@
 package com.example.marsad.ui.utils
 
 import android.content.Context
+import android.icu.text.SimpleDateFormat
+import android.location.Address
+import android.location.Geocoder
+import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.os.LocaleListCompat
 import androidx.preference.PreferenceManager
 import com.example.marsad.R
+import org.json.JSONObject
+import java.net.URL
+import java.text.DateFormat
 import java.text.NumberFormat
+import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 object UnitsUtils {
 
@@ -58,7 +66,7 @@ object UnitsUtils {
 
     fun localizeNumber(number: Number): String {
         val numberFormat =
-            NumberFormat.getNumberInstance(UnitsUtils.getCurrentLocale()!!)
+            NumberFormat.getNumberInstance(getCurrentLocale())
         return numberFormat.format(number)
     }
 
@@ -70,6 +78,37 @@ object UnitsUtils {
 
     fun getCurrentLocale(): Locale =
         AppCompatDelegate.getApplicationLocales()[0] ?: Locale.getDefault()
+
+    fun getCity(context: Context, lat: Double, lon: Double): String {
+        val address = getAddressFromLatAndLon(context, lat, lon)
+
+        return StringBuilder().append(
+            address?.countryName ?: "", ", ", address?.locality ?: ""
+        ).toString()
+    }
+
+
+    private fun getAddressFromLatAndLon(context: Context, lat: Double, lon: Double): Address? {
+        var address: Address? = null
+        val geocoder = Geocoder(context, getCurrentLocale())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            geocoder.getFromLocation(lat, lon, 1) { addresses ->
+                address = addresses[0]
+            }
+        } else {
+            geocoder.getFromLocation(lat, lon, 1)?.get(0)?.let { address = it }
+        }
+        return address
+    }
+
+    private fun getTimeZoneId(lat: Double, lon: Double): String {
+        val timestamp = System.currentTimeMillis() / 1000 // Convert to seconds
+        val url =
+            "https://maps.googleapis.com/maps/api/timezone/json?location=$lat,$lon&timestamp=$timestamp&key={API key}"
+        val response = URL(url).readText()
+        val jsonObject = JSONObject(response)
+        return jsonObject.getString("timeZoneId")
+    }
 }
 
 

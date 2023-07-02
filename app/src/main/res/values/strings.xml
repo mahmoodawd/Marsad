@@ -14,7 +14,7 @@
     <string name="sunrise">sunrise</string>
     <string name="sunset">sunset</string>
     <string name="percentageSymbol" translatable="false">%</string>
-    <string name="weather_unit" >hPa</string>
+    <string name="weather_unit">hPa</string>
     <string name="celsius_suffix">°C</string>
     <string name="permission_msg">We are unable to get your weather data due to location permission, please give us the permission by tapping on the following button</string>
     <string name="grant">Grant</string>
@@ -42,5 +42,9 @@
     <string name="fahrenheit_suffix">°F</string>
     <string name="kelvin_suffix">°K</string>
     <string name="language_key" translatable="false">language</string>
-    <string name="pref_location_method_key">locationMethod</string>
+    <string name="pref_location_method_key" translatable="false">locationMethod</string>
+    <string name="dialog_msg">Use GPS to automatically get your location or pick one from the map</string>
+    <string name="add_to_favorites">Add To favorites</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

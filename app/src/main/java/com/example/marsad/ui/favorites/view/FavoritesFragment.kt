@@ -1,60 +1,178 @@
 package com.example.marsad.ui.favorites.view
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.Navigation
+import androidx.navigation.navGraphViewModels
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.marsad.R
+import com.example.marsad.data.database.LocationLocalDataSource
+import com.example.marsad.data.model.SavedLocation
+import com.example.marsad.data.network.ApiState
+import com.example.marsad.data.network.LocationRemoteDataSource
+import com.example.marsad.data.network.OpenWeatherMapResponse
+import com.example.marsad.data.repositories.LocationRepository
+import com.example.marsad.databinding.FragmentFavoritesBinding
+import com.example.marsad.ui.favorites.viewmodel.FavoritesViewModel
+import com.example.marsad.ui.favorites.viewmodel.SharedViewModel
+import com.example.marsad.ui.home.viewmodel.MyViewModelFactory
+import com.example.marsad.ui.utils.UnitsUtils
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [FavoritesFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class FavoritesFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+class FavoritesFragment : Fragment(), OnMapReadyCallback {
+    private val sharedViewModel: SharedViewModel by activityViewModels()
+    private var locationLat: Double = 0.0
+    private var locationLon: Double = 0.0
+    lateinit var binding: FragmentFavoritesBinding
+    lateinit var viewModel: FavoritesViewModel
+    lateinit var locationItemAdapter: LocationItemAdapter
+    private lateinit var mMap: GoogleMap
+    private lateinit var mapView: View
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentFavoritesBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        mapView = view.findViewById(R.id.map_view)
+        val mapFragment =
+            childFragmentManager.findFragmentById(R.id.googleMapView) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+        initUI(view)
+        setUpViewModel()
+        getLocations()
+        binding.addToFavFab.setOnClickListener {
+            mapView.visibility = View.VISIBLE
+            binding.addToFavFab.visibility = View.GONE
+            binding.savedLocationsRv.visibility = View.GONE
+        }
+        binding.mapView.confrimFab.setOnClickListener {
+            addNewLocation()
+        }
+
+        val itemTouchHelperCallback = LocationItemTouchHelperCallback(
+            requireContext(), locationItemAdapter
+        ) { deletedLocation ->
+            viewModel.removeLocation(deletedLocation)
+
+            Snackbar.make(
+                binding.savedLocationsRv, "Deleted " + deletedLocation.city, Snackbar.LENGTH_LONG
+            ).setAction("Undo") {
+                viewModel.addLocation(deletedLocation)
+            }.show()
+        }
+        ItemTouchHelper(itemTouchHelperCallback).apply {
+            attachToRecyclerView(binding.savedLocationsRv)
+        }
+
+    }
+
+    private fun addNewLocation() {
+        lifecycleScope.launch {
+
+            viewModel.locationWeatherStateFlow.collect { result ->
+                when (result) {
+                    is ApiState.Loading -> {
+                        Toast.makeText(requireContext(), "Fetching......", Toast.LENGTH_LONG).show()
+                    }
+                    is ApiState.Success<*> -> {
+                        val weatherInfo = result.weatherStatus as OpenWeatherMapResponse
+                        saveLocation(weatherInfo)
+                        mapView.visibility = View.GONE
+                        binding.addToFavFab.visibility = View.VISIBLE
+                        binding.savedLocationsRv.visibility = View.VISIBLE
+                    }
+                    else -> {
+                        Toast.makeText(
+                            requireContext(), "Failed To Fetch Data", Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_favorites, container, false)
+    private fun saveLocation(weatherInfo: OpenWeatherMapResponse) {
+        val myLocation = SavedLocation(
+            city = UnitsUtils.getCity(
+                requireContext(), locationLat, locationLon
+            ),
+
+            lat = locationLat,
+            lon = locationLon,
+            description = weatherInfo.weather[0].description,
+            icon = weatherInfo.weather[0].icon,
+            lastTemp = weatherInfo.main.temp.toInt()
+        )
+        viewModel.addLocation(myLocation)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FavoritesFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FavoritesFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    private fun getLocations() {
+        viewModel.getSavedLocations().observe(requireActivity()) {
+            locationItemAdapter.locations = it
+        }
+    }
+
+    private fun setUpViewModel() {
+        val viewModelFactory = MyViewModelFactory(
+            LocationRepository.getInstance(
+                LocationRemoteDataSource, LocationLocalDataSource(requireContext())
+            )
+        )
+        viewModel =
+            ViewModelProvider(requireActivity(), viewModelFactory)[FavoritesViewModel::class.java]
+    }
+
+    private fun initUI(view: View) {
+        locationItemAdapter = LocationItemAdapter(
+            listOf(), {
+                sharedViewModel.setLocation(it)
+                Navigation.findNavController(view)
+                    .navigate(R.id.locationDetailsFragment)
+            }, requireContext()
+        )
+        binding.savedLocationsRv.apply {
+            adapter = locationItemAdapter
+            layoutManager = LinearLayoutManager(requireContext()).apply {
+                orientation = RecyclerView.VERTICAL
             }
+        }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+        mMap.setOnMapClickListener {
+            MarkerOptions().apply {
+                position(it)
+                mMap.clear()
+                mMap.addMarker(this)
+            }
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(it, 40.0F))
+            locationLat = it.latitude
+            locationLon = it.longitude
+            viewModel.getLocationWeather(it.latitude, it.longitude)
+        }
     }
 }

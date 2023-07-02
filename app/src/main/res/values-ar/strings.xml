@@ -26,6 +26,7 @@
     <string name="notification_title">تفعيل الإشعارات</string>
     <string name="general">عامة</string>
     <string name="location_method">طريقة تحديد الموقع</string>
+    <string name="dialog_msg">يمكنك اختيار موقع على الخريطة أو تحديد موقعك تلقائيا عن طريق نظام تحديد المواقع</string>
     <string name="map">الخريطة</string>
     <string name="gps">نظام تحديد المواقع</string>
     <string name="language">اللغة</string>

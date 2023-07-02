@@ -1,6 +1,6 @@
 package com.example.marsad.data.network
 
-import androidx.appcompat.app.AppCompatDelegate
+import com.example.marsad.ui.utils.UnitsUtils
 
 
 const val API_KEY = "d74e0e363a439e102e4a72c39c09de0b"
@@ -17,7 +17,17 @@ object LocationRemoteDataSource : RemoteSource {
             lon,
             API_KEY,
             "metric",
-            "minutely"
+            "minutely",
+            UnitsUtils.getCurrentLocale().language
+        )
+
+    override suspend fun getLocationWeather(lat: Double, lon: Double) =
+        retrofitService.getLocationWeather(
+            lat,
+            lon,
+            API_KEY,
+            "metric",
+            UnitsUtils.getCurrentLocale().language
         )
 
 

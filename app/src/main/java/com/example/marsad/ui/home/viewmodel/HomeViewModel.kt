@@ -13,16 +13,16 @@ import kotlinx.coroutines.launch
 class HomeViewModel(private val locationRepository: LocationRepositoryInterface):ViewModel() {
     val TAG = HomeViewModel::class.java.simpleName
 
-    private val _postStateFlow: MutableStateFlow<ApiState> = MutableStateFlow(ApiState.Loading)
-    val postStateFlow: StateFlow<ApiState> = _postStateFlow
+    private val _weatherDataStateFlow: MutableStateFlow<ApiState> = MutableStateFlow(ApiState.Loading)
+    val weatherDataStateFlow: StateFlow<ApiState> = _weatherDataStateFlow
 
     fun getWeatherStatus(lat:Double, lon:Double){
         viewModelScope.launch {
             locationRepository.getWeatherStatus(lat, lon).catch {e ->
-                _postStateFlow.value = ApiState.Failure(e)
+                _weatherDataStateFlow.value = ApiState.Failure(e)
                 Log.i(TAG, "getWeatherStatus: Failed: ${e.message}")
             }.collect{ weatherData->
-                _postStateFlow.value = ApiState.Success(weatherData)
+                _weatherDataStateFlow.value = ApiState.Success(weatherData)
             }
         }
     }
