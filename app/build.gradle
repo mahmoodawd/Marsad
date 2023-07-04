@@ -58,6 +58,8 @@ dependencies {
     implementation "androidx.room:room-ktx:2.5.2"
     implementation "androidx.room:room-runtime:2.5.2"
     implementation 'androidx.preference:preference:1.2.0'
+    //DataBinding
+    implementation 'androidx.databinding:databinding-common:8.0.2'
     kapt "androidx.room:room-compiler:2.5.2"
     //ViewModel
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'

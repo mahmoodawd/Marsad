@@ -45,6 +45,7 @@
     <string name="pref_location_method_key" translatable="false">locationMethod</string>
     <string name="dialog_msg">Use GPS to automatically get your location or pick one from the map</string>
     <string name="add_to_favorites">Add To favorites</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="no_locations_msg">No Saved Locations yet Use below button to add new</string>
+    <string name="open_nav">openDrawer</string>
+    <string name="close_nav">closeDrawer</string>
 </resources>

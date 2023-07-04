@@ -1,21 +1,16 @@
 package com.example.marsad.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Gravity
-import android.view.MenuItem
-import android.view.WindowManager
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.os.LocaleListCompat
-import androidx.core.view.GravityCompat
-import androidx.navigation.Navigation
-import androidx.navigation.ui.NavigationUI
-import androidx.preference.PreferenceManager
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.appcompat.widget.Toolbar
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.example.marsad.R
 import com.example.marsad.databinding.ActivityMainBinding
-import com.example.marsad.ui.utils.UnitsUtils
-import java.util.Locale
+import com.google.android.material.navigation.NavigationView
+import kotlin.math.log
 
 class MainActivity : AppCompatActivity() {
     lateinit var activityMainBinding: ActivityMainBinding
@@ -25,34 +20,30 @@ class MainActivity : AppCompatActivity() {
         activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(activityMainBinding.root)
 
-        val actionBar = supportActionBar
-        actionBar?.apply {
-            title = UnitsUtils.getTempRepresentation(applicationContext, 36.0)
-            setHomeAsUpIndicator(R.drawable.ic_list_24)
-            setDisplayHomeAsUpEnabled(true)
+        val toolbar = activityMainBinding.toolbar
+        setSupportActionBar(toolbar)
+
+        ActionBarDrawerToggle(
+            this,
+            activityMainBinding.drawerLayout,
+            toolbar,
+            R.string.open_nav,
+            R.string.close_nav
+        ).also {
+            activityMainBinding.drawerLayout.addDrawerListener(it)
+            it.syncState()
         }
 
-        Navigation.findNavController(this, R.id.nav_host_fragment).apply {
-            NavigationUI.setupWithNavController(activityMainBinding.navigatorLayout, this)
+
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        findViewById<NavigationView>(R.id.nav_view)
+            .setupWithNavController(navController)
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            supportActionBar?.title = destination.label
         }
     }
 
-   /* private fun setLocale() {
-        Locale.setDefault(UnitsUtils.getCurrentLocale(this))
-        val config = resources.configuration
-        config.setLocale(Locale.getDefault())
-        resources.updateConfiguration(config, resources.displayMetrics)
-    }
-*/
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            if (activityMainBinding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                activityMainBinding.drawerLayout.closeDrawer(GravityCompat.START)
-            } else {
-                activityMainBinding.drawerLayout.openDrawer(GravityCompat.START)
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
 }
 

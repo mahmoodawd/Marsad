@@ -8,34 +8,25 @@
     <fragment
         android:id="@+id/favoritesFragment"
         android:name="com.example.marsad.ui.favorites.view.FavoritesFragment"
-        android:label="fragment_favorites"
-        tools:layout="@layout/fragment_favorites" >
-        <action
-            android:id="@+id/action_favoritesFragment_to_locationDetailsFragment"
-            app:destination="@id/locationDetailsFragment" />
-    </fragment>
+        android:label="@string/favorites"
+        tools:layout="@layout/fragment_favorites" />
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.marsad.ui.home.view.HomeFragment"
-        android:label="fragment_home"
+        android:label="@string/home"
         tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/weatherAlertsFragment"
         android:name="com.example.marsad.ui.weatheralerts.view.WeatherAlertsFragment"
-        android:label="fragment_weather_alerts"
+        android:label="@string/weather_alerts"
         tools:layout="@layout/fragment_weather_alerts" />
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.marsad.ui.settings.view.SettingsFragment"
-        android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" />
+        android:label="@string/settings" />
     <fragment
         android:id="@+id/locationDetailsFragment"
         android:name="com.example.marsad.ui.favorites.view.LocationDetailsFragment"
         android:label="fragment_location_details"
-        tools:layout="@layout/fragment_location_details" >
-        <argument
-            android:name="savedLocation"
-            app:argType="com.example.marsad.data.model.SavedLocation" />
-    </fragment>
+        tools:layout="@layout/fragment_location_details" />
 </navigation>
