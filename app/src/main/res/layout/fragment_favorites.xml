@@ -4,8 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_background"
     tools:context=".ui.favorites.view.FavoritesFragment">
+
+    <include
+        android:id="@+id/no_locations_view"
+        layout="@layout/no_locations_layout"
+        android:visibility="gone" />
 
     <include
         android:id="@+id/map_view"

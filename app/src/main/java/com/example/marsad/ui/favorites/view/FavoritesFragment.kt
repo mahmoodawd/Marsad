@@ -7,11 +7,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
-import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,7 +32,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
-
 
 class FavoritesFragment : Fragment(), OnMapReadyCallback {
     private val sharedViewModel: SharedViewModel by activityViewModels()
@@ -131,7 +128,14 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
 
     private fun getLocations() {
         viewModel.getSavedLocations().observe(requireActivity()) {
-            locationItemAdapter.locations = it
+            view?.findViewById<View>(R.id.no_locations_view)?.apply {
+                if (it.isEmpty()) {
+                    visibility = View.VISIBLE
+                } else {
+                    locationItemAdapter.locations = it
+                    visibility = View.GONE
+                }
+            }
         }
     }
 
@@ -169,7 +173,7 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
                 mMap.clear()
                 mMap.addMarker(this)
             }
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(it, 40.0F))
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(it, 10.0F))
             locationLat = it.latitude
             locationLon = it.longitude
             viewModel.getLocationWeather(it.latitude, it.longitude)
