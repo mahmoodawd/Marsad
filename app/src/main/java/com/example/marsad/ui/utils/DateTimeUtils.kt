@@ -12,6 +12,11 @@ fun getFullDateAndTime(offset: Int, time: Long): String {
     return dateFormat.format(time * 1000)
 }
 
+fun getDateAndTime(time: Long): String {
+    val dateFormat = SimpleDateFormat("d MMM h:mm a", UnitsUtils.getCurrentLocale())
+    return dateFormat.format(time * 1000)
+}
+
 fun getHour(time: Long): String {
     val dateFormat = SimpleDateFormat("h:mm a", UnitsUtils.getCurrentLocale())
     return dateFormat.format(time * 1000)

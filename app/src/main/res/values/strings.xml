@@ -48,4 +48,12 @@
     <string name="no_locations_msg">No Saved Locations yet Use below button to add new</string>
     <string name="open_nav">openDrawer</string>
     <string name="close_nav">closeDrawer</string>
+    <string name="no_alerts_msg">No Active Alerts</string>
+    <string name="add_new_alert">Add New Alert</string>
+    <string name="save">Save</string>
+    <string name="alarm">Alarm</string>
+    <string name="notification">Notification</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="pick_a_date">Pick a Date</string>
 </resources>
