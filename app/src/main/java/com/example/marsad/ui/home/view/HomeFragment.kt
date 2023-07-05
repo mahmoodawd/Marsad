@@ -23,14 +23,14 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.marsad.R
-import com.example.marsad.data.database.LocationLocalDataSource
+import com.example.marsad.data.database.localdatasources.LocationLocalDataSource
 import com.example.marsad.data.network.*
 import com.example.marsad.data.repositories.LocationRepository
 import com.example.marsad.databinding.FragmentHomeBinding
 import com.example.marsad.ui.home.view.adapters.DayAdapter
 import com.example.marsad.ui.home.view.adapters.HourAdapter
 import com.example.marsad.ui.home.viewmodel.HomeViewModel
-import com.example.marsad.ui.home.viewmodel.MyViewModelFactory
+import com.example.marsad.ui.utils.MyViewModelFactory
 import com.example.marsad.ui.utils.UnitsUtils
 import com.example.marsad.ui.utils.getFullDateAndTime
 import com.example.marsad.ui.utils.getHour

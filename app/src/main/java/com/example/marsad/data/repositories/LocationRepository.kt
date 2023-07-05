@@ -1,6 +1,6 @@
 package com.example.marsad.data.repositories
 
-import com.example.marsad.data.database.LocalSource
+import com.example.marsad.data.database.localdatasources.LocalSource
 import com.example.marsad.data.model.SavedLocation
 import com.example.marsad.data.network.OneCallResponse
 import com.example.marsad.data.network.RemoteSource
@@ -11,13 +11,13 @@ import kotlinx.coroutines.flow.flowOn
 
 class LocationRepository private constructor(
     private val remoteSource: RemoteSource,
-    private val localSource: LocalSource
+    private val localSource: LocalSource<SavedLocation>
 ) : LocationRepositoryInterface {
 
     companion object {
         private var instance: LocationRepository? = null
         fun getInstance(
-            remoteSource: RemoteSource, localSource: LocalSource
+            remoteSource: RemoteSource, localSource: LocalSource<SavedLocation>
         ): LocationRepository {
             if (instance == null) {
                 instance = LocationRepository(remoteSource, localSource)
@@ -41,11 +41,11 @@ class LocationRepository private constructor(
         )
     }.flowOn(Dispatchers.IO)
 
-    override fun getSavedLocations() = localSource.getAllLocations().flowOn(Dispatchers.IO)
+    override fun getSavedLocations() = localSource.getAllItems().flowOn(Dispatchers.IO)
 
     override suspend fun addLocation(savedLocation: SavedLocation) =
-        localSource.addLocation(savedLocation)
+        localSource.addNewItem(savedLocation)
 
     override suspend fun deleteLocation(savedLocation: SavedLocation) =
-        localSource.deleteLocation(savedLocation)
+        localSource.deleteItem(savedLocation)
 }

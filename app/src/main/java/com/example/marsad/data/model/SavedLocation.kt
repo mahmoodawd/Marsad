@@ -1,6 +1,5 @@
 package com.example.marsad.data.model
 
-import android.os.Parcelable
 import androidx.room.Entity
 import java.io.Serializable
 

@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.marsad.R
-import com.example.marsad.data.database.LocationLocalDataSource
+import com.example.marsad.data.database.localdatasources.LocationLocalDataSource
 import com.example.marsad.data.model.SavedLocation
 import com.example.marsad.data.network.ApiState
 import com.example.marsad.data.network.LocationRemoteDataSource
@@ -23,7 +23,7 @@ import com.example.marsad.data.repositories.LocationRepository
 import com.example.marsad.databinding.FragmentFavoritesBinding
 import com.example.marsad.ui.favorites.viewmodel.FavoritesViewModel
 import com.example.marsad.ui.favorites.viewmodel.SharedViewModel
-import com.example.marsad.ui.home.viewmodel.MyViewModelFactory
+import com.example.marsad.ui.utils.MyViewModelFactory
 import com.example.marsad.ui.utils.UnitsUtils
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap

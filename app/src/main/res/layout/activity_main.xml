@@ -17,19 +17,12 @@
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            app:titleCentered="true"
-            android:background="@color/md_theme_light_primary"
             android:layout_height="?attr/actionBarSize"
+            android:layout_margin="8dp"
+            android:background="@drawable/full_circular_gradient_bg"
+            app:titleCentered="true"
             app:titleTextColor="@color/md_theme_light_onPrimary" />
 
-        <!--<androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/md_theme_light_primary"
-            android:elevation="4dp"
-            android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />-->
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/nav_host_fragment"
@@ -52,8 +45,8 @@
         android:layout_marginStart="7dp"
         android:background="@drawable/gradient_background"
         android:fitsSystemWindows="true"
-        app:itemTextColor="@color/md_theme_light_onPrimary"
         app:itemIconTint="@color/md_theme_light_onPrimary"
+        app:itemTextColor="@color/md_theme_light_onPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

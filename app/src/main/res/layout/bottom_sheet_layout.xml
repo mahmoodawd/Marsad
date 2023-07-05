@@ -77,6 +77,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="32dp"
+            android:checkedButton="@id/radio_button_notification"
             android:gravity="center"
             android:orientation="horizontal"
             app:layout_constraintBottom_toTopOf="@+id/save_button"
@@ -129,6 +130,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:text="@string/save"
+            style="@style/Widget.Material3.Button.ElevatedButton"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline_end"
             app:layout_constraintStart_toStartOf="@+id/guideline_start"

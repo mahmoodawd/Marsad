@@ -1,4 +1,4 @@
-package com.example.marsad.data.database
+package com.example.marsad.data.database.dao
 
 import androidx.room.*
 import com.example.marsad.data.model.SavedLocation

@@ -1,24 +1,28 @@
 package com.example.marsad.ui.weatheralerts.view
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.marsad.R
+import com.example.marsad.data.database.localdatasources.AlertLocalDataSource
 import com.example.marsad.data.model.AlertItem
-import com.example.marsad.data.model.AlertType
+import com.example.marsad.data.repositories.AlertRepository
 import com.example.marsad.databinding.FragmentWeatherAlertsBinding
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
-import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.example.marsad.ui.favorites.view.LocationItemTouchHelperCallback
+import com.example.marsad.ui.weatheralerts.viewmodel.AlertViewModelFactory
+import com.example.marsad.ui.weatheralerts.viewmodel.WeatherAlertsViewModel
+import com.google.android.material.snackbar.Snackbar
 
 class WeatherAlertsFragment : Fragment() {
     lateinit var binding: FragmentWeatherAlertsBinding
     lateinit var alertItemAdapter: AlertItemAdapter
+    lateinit var viewModel: WeatherAlertsViewModel
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -29,35 +33,56 @@ class WeatherAlertsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setUpAdapter(view)
-        binding.addNewAlertFab.setOnClickListener { showBottomSheet(it) }
+        setUpAdapter()
+        setUpViewModel()
+        getActiveAlerts()
+        binding.addNewAlertFab.setOnClickListener { showBottomSheet(view) }
+
+        val itemTouchHelperCallback = AlertItemTouchHelperCallback(
+            requireContext(), alertItemAdapter
+        ) { swipedAlert ->
+            performSwiping(swipedAlert)
+        }
+        ItemTouchHelper(itemTouchHelperCallback).apply {
+            attachToRecyclerView(binding.activeAlertsRv)
+        }
+
     }
 
-    private fun setUpAdapter(view: View) {
-        val alertItemList = listOf(
-            AlertItem(1625428800, 1625439600, AlertType.ALARM),
-            AlertItem(1625884800, 1625892000, AlertType.NOTIFICATION),
-            AlertItem(1626278400, 1626285600, AlertType.ALARM),
-            AlertItem(1626447600, 1626458400, AlertType.NOTIFICATION),
-            AlertItem(1626980400, 1626984000, AlertType.ALARM),
-            AlertItem(1627401600, 1627412400, AlertType.NOTIFICATION),
-            AlertItem(1628827200, 1628838000, AlertType.ALARM),
-            AlertItem(1629103200, 1629114000, AlertType.NOTIFICATION),
-            AlertItem(1629518400, 1629525600, AlertType.ALARM),
-            AlertItem(1629651600, 1629662400, AlertType.NOTIFICATION),
-            AlertItem(1626980400, 1626984000, AlertType.ALARM),
-            AlertItem(1627401600, 1627412400, AlertType.NOTIFICATION),
-            AlertItem(1628827200, 1628838000, AlertType.ALARM),
-            AlertItem(1629103200, 1629114000, AlertType.NOTIFICATION),
-            AlertItem(1629518400, 1629525600, AlertType.ALARM),
-            AlertItem(1629651600, 1629662400, AlertType.NOTIFICATION)
-        )
-        alertItemAdapter = AlertItemAdapter(alertItemList, requireContext())
-        if (alertItemAdapter.alertItemList.isEmpty()) {
-            view.findViewById<View>(R.id.no_alerts_view).visibility = View.VISIBLE
-        } else {
-            view.findViewById<View>(R.id.no_alerts_view).visibility = View.GONE
+    private fun performSwiping(swipedAlert: AlertItem) {
+        viewModel.removeAlert(swipedAlert)
+
+        Snackbar.make(
+            binding.activeAlertsRv, "Alert Deleted", Snackbar.LENGTH_LONG
+        ).setAction("Undo") {
+            viewModel.addAlert(swipedAlert)
+        }.show()
+    }
+
+
+    private fun getActiveAlerts() {
+        viewModel.getActiveAlerts().observe(requireActivity()) {
+            view?.findViewById<View>(R.id.no_alerts_view)?.apply {
+                if (it.isEmpty()) {
+                    visibility = View.VISIBLE
+                } else {
+                    alertItemAdapter.alertItemList = it
+                    visibility = View.GONE
+                }
+            }
         }
+    }
+
+    private fun setUpViewModel() {
+        val factory = AlertViewModelFactory(
+            AlertRepository.getInstance(AlertLocalDataSource(requireContext()))
+        )
+        viewModel =
+            ViewModelProvider(requireActivity(), factory)[WeatherAlertsViewModel::class.java]
+    }
+
+    private fun setUpAdapter() {
+        alertItemAdapter = AlertItemAdapter(listOf(), requireContext())
         binding.activeAlertsRv.apply {
             adapter = alertItemAdapter
             layoutManager = LinearLayoutManager(requireContext()).apply {
@@ -67,11 +92,16 @@ class WeatherAlertsFragment : Fragment() {
         }
     }
 
+
     private fun showBottomSheet(view: View) {
-        val bottomSheetDialog = BottomSheetDialog(requireContext())
+        /*val bottomSheetDialog = BottomSheetDialog(requireContext())
         val view = layoutInflater.inflate(R.layout.bottom_sheet_layout, null)
         bottomSheetDialog.setContentView(view)
-        bottomSheetDialog.show()
+        bottomSheetDialog.show()*/
+
+        val modalBottomSheet = ModalBottomSheet()
+        modalBottomSheet.show(requireActivity().supportFragmentManager, ModalBottomSheet.TAG)
 
     }
 }
+

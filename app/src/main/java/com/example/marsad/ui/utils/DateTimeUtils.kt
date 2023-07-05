@@ -16,6 +16,10 @@ fun getDateAndTime(time: Long): String {
     val dateFormat = SimpleDateFormat("d MMM h:mm a", UnitsUtils.getCurrentLocale())
     return dateFormat.format(time * 1000)
 }
+fun getDate(date: Long): String {
+    val dateFormat = SimpleDateFormat("EEE dd, MMM", UnitsUtils.getCurrentLocale())
+    return dateFormat.format(date)
+}
 
 fun getHour(time: Long): String {
     val dateFormat = SimpleDateFormat("h:mm a", UnitsUtils.getCurrentLocale())

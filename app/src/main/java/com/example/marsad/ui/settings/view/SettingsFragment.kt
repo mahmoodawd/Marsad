@@ -33,24 +33,30 @@ class SettingsFragment : PreferenceFragmentCompat(),
     private fun setPrefMethod(method: String?) {
         when (method) {
             "gps" -> {
-                val intent = Intent(requireContext(), MainActivity::class.java)
-                startActivity(intent)
-                requireActivity().finish()
+                restartWithNewMethod()
             }
             "map" -> {
-                val sharedPreferences = activity?.getSharedPreferences(
-                    getString(R.string.preferences_file_key), Context.MODE_PRIVATE
-                ) ?: return
-                with(sharedPreferences.edit()) {
-                    putBoolean(getString(R.string.first_use_key), true)
-                    putString(getString(R.string.latitude_key), "0.0")
-                    putString(getString(R.string.longitude_key), "0.0")
-                        .apply()
-                }
-                val intent = Intent(requireContext(), MainActivity::class.java)
-                startActivity(intent)
-                requireActivity().finish()
+                clearPrefs()
+                restartWithNewMethod()
             }
+        }
+    }
+
+    private fun restartWithNewMethod() {
+        val intent = Intent(requireContext(), MainActivity::class.java)
+        startActivity(intent)
+        requireActivity().finish()
+    }
+
+    private fun clearPrefs() {
+        val sharedPreferences = activity?.getSharedPreferences(
+            getString(R.string.preferences_file_key), Context.MODE_PRIVATE
+        ) ?: return
+        with(sharedPreferences.edit()) {
+            putBoolean(getString(R.string.first_use_key), true)  //To View map
+            putString(getString(R.string.latitude_key), "0.0")
+            putString(getString(R.string.longitude_key), "0.0")
+                .apply()
         }
     }
 

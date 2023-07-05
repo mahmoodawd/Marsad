@@ -1,9 +1,11 @@
-package com.example.marsad.ui.home.viewmodel
+package com.example.marsad.ui.utils
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.marsad.data.repositories.LocationRepositoryInterface
 import com.example.marsad.ui.favorites.viewmodel.FavoritesViewModel
+import com.example.marsad.ui.home.viewmodel.HomeViewModel
+import com.example.marsad.ui.weatheralerts.viewmodel.WeatherAlertsViewModel
 
 class MyViewModelFactory(private val _repo: LocationRepositoryInterface) :
     ViewModelProvider.Factory {
@@ -12,7 +14,7 @@ class MyViewModelFactory(private val _repo: LocationRepositoryInterface) :
             HomeViewModel(_repo) as T
         } else if (modelClass.isAssignableFrom(FavoritesViewModel::class.java)) {
             FavoritesViewModel(_repo) as T
-        } else {
+        }  else {
             throw java.lang.IllegalArgumentException("No Such ViewModel")
         }
     }
