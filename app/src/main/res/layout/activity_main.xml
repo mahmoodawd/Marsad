@@ -45,6 +45,7 @@
         android:layout_marginStart="7dp"
         android:background="@drawable/gradient_background"
         android:fitsSystemWindows="true"
+        app:headerLayout="@layout/drawer_header"
         app:itemIconTint="@color/md_theme_light_onPrimary"
         app:itemTextColor="@color/md_theme_light_onPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
