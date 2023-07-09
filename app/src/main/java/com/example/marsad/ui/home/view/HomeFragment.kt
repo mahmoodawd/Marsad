@@ -172,7 +172,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private fun setupViewModel() {
         val homeViewModelFactory = MyViewModelFactory(
             LocationRepository.getInstance(
-                LocationRemoteDataSource, LocationLocalDataSource(requireContext())
+                WeatherRemoteDataSource, LocationLocalDataSource(requireContext())
             )
         )
         homeViewModel = ViewModelProvider(this, homeViewModelFactory)[HomeViewModel::class.java]

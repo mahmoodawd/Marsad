@@ -16,6 +16,15 @@ interface ApiService {
         @Query("lang") lang: String
     ): Response<OneCallResponse>
 
+    @GET("onecall")
+    suspend fun getWeatherAlerts(
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
+        @Query("appid") apiKey: String = API_KEY,
+        @Query("units") units: String = "metric",
+        @Query("exclude") exclude: String = "current,minutely,hourly,daily"
+    ): Response<AlertResponse>
+
     @GET("weather")
     suspend fun getLocationWeather(
         @Query("lat") lat: Double,

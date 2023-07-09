@@ -13,6 +13,8 @@ class AlertLocalDataSource(val context: Context) : LocalSource<AlertItem> {
 
     override fun getAllItems(): Flow<List<AlertItem>> = alertsDao.getAllAlerts()
 
+    override fun getItemById(itemId: Long): Flow<AlertItem> = alertsDao.getAlertById(itemId)
+
     override suspend fun addNewItem(item: AlertItem) = alertsDao.insert(item)
 
     override suspend fun deleteItem(item: AlertItem) = alertsDao.delete(item)

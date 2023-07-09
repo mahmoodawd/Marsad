@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.marsad.R
 import com.example.marsad.data.database.localdatasources.LocationLocalDataSource
 import com.example.marsad.data.network.ApiState
-import com.example.marsad.data.network.LocationRemoteDataSource
+import com.example.marsad.data.network.WeatherRemoteDataSource
 import com.example.marsad.data.network.OneCallResponse
 import com.example.marsad.data.repositories.LocationRepository
 import com.example.marsad.databinding.FragmentLocationDetailsBinding
@@ -86,7 +86,7 @@ class LocationDetailsFragment : Fragment() {
     private fun setupViewModel() {
         val homeViewModelFactory = MyViewModelFactory(
             LocationRepository.getInstance(
-                LocationRemoteDataSource, LocationLocalDataSource(requireContext())
+                WeatherRemoteDataSource, LocationLocalDataSource(requireContext())
             )
         )
         homeViewModel = ViewModelProvider(this, homeViewModelFactory)[HomeViewModel::class.java]

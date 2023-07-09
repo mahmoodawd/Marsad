@@ -56,4 +56,13 @@
     <string name="from">From</string>
     <string name="to">To</string>
     <string name="pick_a_date">Pick a Date</string>
+    <string name="alerts_channel_name">Alerts Channel</string>
+    <string name="alerts_channel_description">This channel is used for sending alerts for weather</string>
+    <string name="no_alerts_description">Everything is fine during the specified period</string>
+    <string name="alert_title_key">alertTitle</string>
+    <string name="alert_description_key">alertDescription</string>
+    <string name="alert_type_key">alertType</string>
+    <string name="alert_id_key">alertId</string>
+    <string name="alert_Item_key">alertItemKey</string>
+    <string name="stop_alarm">Stop Alarm</string>
 </resources>

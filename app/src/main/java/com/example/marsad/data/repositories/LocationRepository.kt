@@ -2,10 +2,12 @@ package com.example.marsad.data.repositories
 
 import com.example.marsad.data.database.localdatasources.LocalSource
 import com.example.marsad.data.model.SavedLocation
+import com.example.marsad.data.network.AlertResponse
 import com.example.marsad.data.network.OneCallResponse
 import com.example.marsad.data.network.RemoteSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
@@ -34,6 +36,7 @@ class LocationRepository private constructor(
             )
         }.flowOn(Dispatchers.IO) as Flow<OneCallResponse>
     }
+
 
     override suspend fun getLocationWeather(lat: Double, lon: Double) = flow {
         emit(

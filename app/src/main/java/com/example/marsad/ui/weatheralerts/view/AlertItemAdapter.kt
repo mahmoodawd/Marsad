@@ -38,8 +38,8 @@ class AlertItemAdapter(
             if (currentAlert.alertType == AlertType.ALARM) R.drawable.ic_alarm_24
             else R.drawable.ic_alert_24
 
-        holder.binding.startTimeTv.text = getDate(currentAlert.startTime)
-        holder.binding.endTimeTv.text = getDate(currentAlert.endTime)
+        holder.binding.startTimeTv.text = getDate(currentAlert.start)
+        holder.binding.endTimeTv.text = getDate(currentAlert.end)
         holder.binding.alarmTypeIcon.setImageResource(alertIcon)
     }
 

@@ -1,43 +1,33 @@
 package com.example.marsad.ui
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.appcompat.widget.Toolbar
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.marsad.R
 import com.example.marsad.databinding.ActivityMainBinding
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.navigation.NavigationView
-import kotlin.math.log
 
 class MainActivity : AppCompatActivity() {
-    lateinit var activityMainBinding: ActivityMainBinding
+    lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(activityMainBinding.root)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val toolbar = activityMainBinding.toolbar
+        val toolbar = binding.toolbar
         setSupportActionBar(toolbar)
 
         ActionBarDrawerToggle(
             this,
-            activityMainBinding.drawerLayout,
+            binding.drawerLayout,
             toolbar,
             R.string.open_nav,
             R.string.close_nav
         ).also {
-            activityMainBinding.drawerLayout.addDrawerListener(it)
+            binding.drawerLayout.addDrawerListener(it)
             it.syncState()
         }
 

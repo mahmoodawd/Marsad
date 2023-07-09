@@ -5,7 +5,7 @@ import com.example.marsad.ui.utils.UnitsUtils
 
 const val API_KEY = "d74e0e363a439e102e4a72c39c09de0b"
 
-object LocationRemoteDataSource : RemoteSource {
+object WeatherRemoteDataSource : RemoteSource {
 
     val retrofitService: ApiService by lazy {
         RetrofitHelper.retrofitInstance.create(ApiService::class.java)
@@ -20,6 +20,9 @@ object LocationRemoteDataSource : RemoteSource {
             "minutely",
             UnitsUtils.getCurrentLocale().language
         )
+
+    override suspend fun getWeatherAlerts(lat: Double, lon: Double) =
+        retrofitService.getWeatherAlerts(lat, lon)
 
     override suspend fun getLocationWeather(lat: Double, lon: Double) =
         retrofitService.getLocationWeather(

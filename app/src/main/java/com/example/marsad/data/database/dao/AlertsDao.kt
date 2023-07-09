@@ -9,6 +9,9 @@ interface AlertsDao {
     @Query("SELECT * FROM alert")
     fun getAllAlerts(): Flow<List<AlertItem>>
 
+    @Query("SELECT * FROM alert where id = :id")
+    fun getAlertById(id: Long): Flow<AlertItem>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(alertItem: AlertItem): Long
 

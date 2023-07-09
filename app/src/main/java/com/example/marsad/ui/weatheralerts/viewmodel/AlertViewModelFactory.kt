@@ -2,13 +2,9 @@ package com.example.marsad.ui.weatheralerts.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.marsad.data.repositories.AlertRepositoryInterface
-import com.example.marsad.data.repositories.LocationRepositoryInterface
-import com.example.marsad.ui.favorites.viewmodel.FavoritesViewModel
-import com.example.marsad.ui.home.viewmodel.HomeViewModel
-import com.example.marsad.ui.weatheralerts.viewmodel.WeatherAlertsViewModel
+import com.example.marsad.data.repositories.AlertsRepositoryInterface
 
-class AlertViewModelFactory(private val _repo: AlertRepositoryInterface) :
+class AlertViewModelFactory(private val _repo: AlertsRepositoryInterface) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return if (modelClass.isAssignableFrom(WeatherAlertsViewModel::class.java)) {

@@ -5,14 +5,20 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.marsad.data.model.AlertItem
-import com.example.marsad.data.repositories.AlertRepositoryInterface
+import com.example.marsad.data.network.ApiState
+import com.example.marsad.data.repositories.AlertsRepositoryInterface
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class WeatherAlertsViewModel(val repository: AlertRepositoryInterface) : ViewModel() {
+class WeatherAlertsViewModel(val repository: AlertsRepositoryInterface) : ViewModel() {
     private val TAG = WeatherAlertsViewModel::class.java.simpleName
+    private val _weatherAlertsStateFlow: MutableStateFlow<ApiState> =
+        MutableStateFlow(ApiState.Loading)
+    val weatherAlertsStateFlow: StateFlow<ApiState> = _weatherAlertsStateFlow
 
     fun getActiveAlerts(): MutableLiveData<List<AlertItem>> {
         val alertList = MutableLiveData<List<AlertItem>>()
@@ -24,6 +30,18 @@ class WeatherAlertsViewModel(val repository: AlertRepositoryInterface) : ViewMod
             }
         }
         return alertList
+    }
+
+    fun getAlertById(alertId: Long): MutableLiveData<AlertItem> {
+        val alertItem = MutableLiveData<AlertItem>()
+        viewModelScope.launch {
+            repository.getAlertById(alertId).catch { e ->
+                Log.i(TAG, "getAlertById: ${e.message}")
+            }.collect {
+                alertItem.value = it
+            }
+        }
+        return alertItem
     }
 
     fun addAlert(alert: AlertItem): MutableLiveData<Boolean> {
@@ -46,6 +64,17 @@ class WeatherAlertsViewModel(val repository: AlertRepositoryInterface) : ViewMod
             }
         }
         return status
+    }
+
+    fun getWeatherAlerts(lat: Double, lon: Double) {
+        viewModelScope.launch {
+            repository.getWeatherAlerts(lat, lon).catch { e ->
+                _weatherAlertsStateFlow.value = ApiState.Failure(e)
+                Log.i(TAG, "getWeatherAlerts: ${e.message}")
+            }.collect {
+                _weatherAlertsStateFlow.value = ApiState.Success(it)
+            }
+        }
     }
 
 }

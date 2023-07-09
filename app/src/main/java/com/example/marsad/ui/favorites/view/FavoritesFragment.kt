@@ -17,7 +17,7 @@ import com.example.marsad.R
 import com.example.marsad.data.database.localdatasources.LocationLocalDataSource
 import com.example.marsad.data.model.SavedLocation
 import com.example.marsad.data.network.ApiState
-import com.example.marsad.data.network.LocationRemoteDataSource
+import com.example.marsad.data.network.WeatherRemoteDataSource
 import com.example.marsad.data.network.OpenWeatherMapResponse
 import com.example.marsad.data.repositories.LocationRepository
 import com.example.marsad.databinding.FragmentFavoritesBinding
@@ -142,7 +142,7 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
     private fun setUpViewModel() {
         val viewModelFactory = MyViewModelFactory(
             LocationRepository.getInstance(
-                LocationRemoteDataSource, LocationLocalDataSource(requireContext())
+                WeatherRemoteDataSource, LocationLocalDataSource(requireContext())
             )
         )
         viewModel =
