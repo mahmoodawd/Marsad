@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
@@ -64,7 +65,7 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
             binding.addToFavFab.visibility = View.GONE
             binding.savedLocationsRv.visibility = View.GONE
         }
-        binding.mapView.confrimFab.setOnClickListener {
+        binding.mapView.confirmFab.setOnClickListener {
             addNewLocation()
         }
 
@@ -176,6 +177,12 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(it, 10.0F))
             locationLat = it.latitude
             locationLon = it.longitude
+            binding.mapView.confirmFab.apply {
+                text =
+                    UnitsUtils.getCity(requireContext(), locationLat, locationLon)
+                icon = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_check)
+            }
+
             viewModel.getLocationWeather(it.latitude, it.longitude)
         }
     }

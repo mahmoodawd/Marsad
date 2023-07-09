@@ -65,4 +65,6 @@
     <string name="alert_id_key">alertId</string>
     <string name="alert_Item_key">alertItemKey</string>
     <string name="stop_alarm">Stop Alarm</string>
+    <string name="pick_a_location">Pick Location</string>
+    <string name="today">Today</string>
 </resources>

@@ -29,6 +29,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import java.util.*
+import kotlin.time.Duration.Companion.days
 
 class ModalBottomSheet : BottomSheetDialogFragment() {
     private lateinit var binding: BottomSheetLayoutBinding

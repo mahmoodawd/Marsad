@@ -153,8 +153,8 @@ class LocationDetailsFragment : Fragment() {
                 feelsLikeTv.text =
                     UnitsUtils.getTempRepresentation(requireContext(), it.feels_like)
 
-                hourAdapter.hours = weatherStatus.hourly
-                dayAdapter.days = weatherStatus.daily
+                hourAdapter.hours = weatherStatus.hourly.take(24)
+                dayAdapter.days = weatherStatus.daily.take(7)
 
 
 

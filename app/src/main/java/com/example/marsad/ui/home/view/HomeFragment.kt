@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.fragment.app.Fragment
@@ -42,6 +43,9 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -59,7 +63,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private lateinit var mapView: View
     private lateinit var homeContent: View
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    lateinit var fragmentHomeBinding: FragmentHomeBinding
+    private lateinit var binding: FragmentHomeBinding
     lateinit var homeViewModel: HomeViewModel
     lateinit var hourAdapter: HourAdapter
     lateinit var dayAdapter: DayAdapter
@@ -70,8 +74,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     ): View? {
         fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireContext())
-        fragmentHomeBinding = FragmentHomeBinding.inflate(inflater, container, false)
-        return fragmentHomeBinding.root
+        binding = FragmentHomeBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -80,11 +84,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.map_view)
         homeContent = view.findViewById(R.id.home_content)
 
-        fragmentHomeBinding.requestLocationView.grantBtn.setOnClickListener {
+        binding.requestLocationView.grantBtn.setOnClickListener {
             requestLocationView.visibility = View.GONE
             requestLocationPermissions()
         }
-        fragmentHomeBinding.mapView.confrimFab.setOnClickListener {
+        binding.mapView.confirmFab.setOnClickListener {
             mapView.visibility = View.GONE
             requestLocationView.visibility = View.GONE
             homeContent.visibility = View.VISIBLE
@@ -153,7 +157,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     private fun setupAdapters() {
         hourAdapter = HourAdapter(listOf(), requireContext())
-        fragmentHomeBinding.homeContent.hoursRv.apply {
+        binding.homeContent.hoursRv.apply {
             adapter = hourAdapter
             layoutManager = LinearLayoutManager(requireContext()).apply {
                 orientation = RecyclerView.HORIZONTAL
@@ -161,7 +165,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         }
 
         dayAdapter = DayAdapter(listOf(), requireContext())
-        fragmentHomeBinding.homeContent.daysRv.apply {
+        binding.homeContent.daysRv.apply {
             adapter = dayAdapter
             layoutManager = LinearLayoutManager(requireContext()).apply {
                 orientation = RecyclerView.VERTICAL
@@ -186,16 +190,16 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             homeViewModel.weatherDataStateFlow.collect { result ->
                 when (result) {
                     is ApiState.Loading -> {
-                        fragmentHomeBinding.loadingBar.visibility = View.VISIBLE
+                        binding.loadingBar.visibility = View.VISIBLE
                         Toast.makeText(requireContext(), "Fetching......", Toast.LENGTH_LONG).show()
                     }
                     is ApiState.Success<*> -> {
-                        fragmentHomeBinding.loadingBar.visibility = View.GONE
+                        binding.loadingBar.visibility = View.GONE
                         homeContent.visibility = View.VISIBLE
                         buildViews(result.weatherStatus as OneCallResponse)
                     }
                     else -> {
-                        fragmentHomeBinding.loadingBar.visibility = View.GONE
+                        binding.loadingBar.visibility = View.GONE
                         Toast.makeText(requireContext(), "Failed To Fetch Data", Toast.LENGTH_SHORT)
                             .show()
                     }
@@ -206,8 +210,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     private fun buildViews(weatherStatus: OneCallResponse) {
         val currentDayWeather = weatherStatus.current
-        val currentDayView = fragmentHomeBinding.homeContent.currentDayCardView
-        val propertiesCard = fragmentHomeBinding.homeContent.propertiesCard
+        val currentDayView = binding.homeContent.currentDayCardView
+        val propertiesCard = binding.homeContent.propertiesCard
 
 
         currentDayView.apply {
@@ -239,8 +243,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 feelsLikeTv.text =
                     UnitsUtils.getTempRepresentation(requireContext(), it.feels_like)
 
-                hourAdapter.hours = weatherStatus.hourly
-                dayAdapter.days = weatherStatus.daily
+                hourAdapter.hours = weatherStatus.hourly.take(24)
+                dayAdapter.days = weatherStatus.daily.take(7)
 
 
 
@@ -372,6 +376,12 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(it, 10.0F))
             lat = it.latitude
             lon = it.longitude
+            binding.mapView.confirmFab.apply {
+                text =
+                    UnitsUtils.getCity(requireContext(), lat, lon)
+                icon = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_check)
+            }
+
         }
 
     }
