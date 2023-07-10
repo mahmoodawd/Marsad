@@ -18,7 +18,7 @@ class HomeViewModel(private val locationRepository: LocationRepositoryInterface)
 
     fun getWeatherStatus(lat:Double, lon:Double){
         viewModelScope.launch {
-            locationRepository.getWeatherStatus(lat, lon).catch {e ->
+            locationRepository.getWeatherDetails(lat, lon).catch { e ->
                 _weatherDataStateFlow.value = ApiState.Failure(e)
                 Log.i(TAG, "getWeatherStatus: Failed: ${e.message}")
             }.collect{ weatherData->

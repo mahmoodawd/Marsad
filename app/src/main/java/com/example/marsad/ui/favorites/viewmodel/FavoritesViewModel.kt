@@ -38,9 +38,7 @@ class FavoritesViewModel(private val repository: LocationRepositoryInterface) : 
         val status = MutableLiveData<Boolean>()
         viewModelScope.launch(Dispatchers.IO) {
             val st = repository.addLocation(savedLocation)
-            withContext(Dispatchers.Main) {
-                status.value = st > 0
-            }
+            status.value = st > 0
         }
         return status
     }
@@ -49,9 +47,7 @@ class FavoritesViewModel(private val repository: LocationRepositoryInterface) : 
         val status = MutableLiveData<Boolean>()
         viewModelScope.launch(Dispatchers.IO) {
             val st = repository.deleteLocation(savedLocation)
-            withContext(Dispatchers.Main) {
-                status.value = st > 0
-            }
+            status.value = st > 0
         }
         return status
     }

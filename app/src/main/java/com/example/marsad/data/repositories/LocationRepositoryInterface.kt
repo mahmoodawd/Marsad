@@ -8,7 +8,7 @@ import com.example.marsad.data.network.OpenWeatherMapResponse
 import kotlinx.coroutines.flow.Flow
 
 interface LocationRepositoryInterface {
-    suspend fun getWeatherStatus(lat: Double, lon: Double): Flow<OneCallResponse>
+    suspend fun getWeatherDetails(lat: Double, lon: Double): Flow<OneCallResponse>
     suspend fun getLocationWeather(lat: Double, lon: Double): Flow<OpenWeatherMapResponse?>
     fun getSavedLocations(): Flow<List<SavedLocation>>
     suspend fun addLocation(savedLocation: SavedLocation): Long

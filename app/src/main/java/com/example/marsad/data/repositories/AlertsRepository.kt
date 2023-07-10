@@ -6,12 +6,13 @@ import com.example.marsad.data.network.AlertResponse
 import com.example.marsad.data.network.RemoteSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
-class AlertsRepository(
+class AlertsRepository private constructor(
     private val remoteSource: RemoteSource,
-    val localSource: LocalSource<AlertItem>
+    private val localSource: LocalSource<AlertItem>
 ) : AlertsRepositoryInterface {
 
     companion object {

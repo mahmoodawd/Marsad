@@ -5,6 +5,7 @@ import com.example.marsad.data.model.SavedLocation
 import com.example.marsad.data.network.FakeWeatherRemoteDataSource
 import com.example.marsad.data.network.OneCallResponse
 import com.example.marsad.data.network.OpenWeatherMapResponse
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.nullValue

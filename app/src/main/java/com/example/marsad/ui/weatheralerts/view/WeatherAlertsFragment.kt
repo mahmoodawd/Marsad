@@ -84,16 +84,7 @@ class WeatherAlertsFragment : Fragment() {
                 if (it.isEmpty()) {
                     visibility = View.VISIBLE
                 } else {
-                    val activeAlerts = it.filter { item ->
-                        item.start > System.currentTimeMillis()
-                    }
-                    val passedAlerts = it.filter { item ->
-                        item.start <= System.currentTimeMillis()
-                    }
-                    passedAlerts.forEach {
-                        viewModel.removeAlert(it)
-                    }
-                    alertItemAdapter.alertItemList = activeAlerts
+                    alertItemAdapter.alertItemList = it
                     visibility = View.GONE
                 }
             }
