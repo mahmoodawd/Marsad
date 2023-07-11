@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -38,9 +40,9 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
     private val sharedViewModel: SharedViewModel by activityViewModels()
     private var locationLat: Double = 0.0
     private var locationLon: Double = 0.0
-    lateinit var binding: FragmentFavoritesBinding
-    lateinit var viewModel: FavoritesViewModel
-    lateinit var locationItemAdapter: LocationItemAdapter
+    private lateinit var binding: FragmentFavoritesBinding
+    private lateinit var viewModel: FavoritesViewModel
+    private lateinit var locationItemAdapter: LocationItemAdapter
     private lateinit var mMap: GoogleMap
     private lateinit var mapView: View
 
@@ -57,18 +59,44 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
         val mapFragment =
             childFragmentManager.findFragmentById(R.id.googleMapView) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
         initUI(view)
         setUpViewModel()
         getLocations()
+        setClickListeners()
+        setSwipeBehaviour()
+
+        binding.mapView.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+
+                val location = binding.mapView.searchView.query.toString()
+
+                val latLon = UnitsUtils.getLatLngFromLocation(requireContext(), location)
+                mMap.addMarker(MarkerOptions().position(latLon).title(location))
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLon, 10.0f))
+
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+        })
+    }
+
+    private fun setClickListeners() {
         binding.addToFavFab.setOnClickListener {
             mapView.visibility = View.VISIBLE
             binding.addToFavFab.visibility = View.GONE
             binding.savedLocationsRv.visibility = View.GONE
+            (requireActivity() as AppCompatActivity).supportActionBar?.hide()
         }
         binding.mapView.confirmFab.setOnClickListener {
             addNewLocation()
         }
+    }
 
+    private fun setSwipeBehaviour() {
         val itemTouchHelperCallback = LocationItemTouchHelperCallback(
             requireContext(), locationItemAdapter
         ) { deletedLocation ->
@@ -83,7 +111,6 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
         ItemTouchHelper(itemTouchHelperCallback).apply {
             attachToRecyclerView(binding.savedLocationsRv)
         }
-
     }
 
     private fun addNewLocation() {
@@ -100,6 +127,7 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
                         mapView.visibility = View.GONE
                         binding.addToFavFab.visibility = View.VISIBLE
                         binding.savedLocationsRv.visibility = View.VISIBLE
+                        (requireActivity() as AppCompatActivity).supportActionBar?.show()
                     }
                     else -> {
                         Toast.makeText(

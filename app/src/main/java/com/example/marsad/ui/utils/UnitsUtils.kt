@@ -1,20 +1,17 @@
 package com.example.marsad.ui.utils
 
 import android.content.Context
-import android.icu.text.SimpleDateFormat
 import android.location.Address
 import android.location.Geocoder
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import com.example.marsad.R
+import com.google.android.gms.maps.model.LatLng
 import org.json.JSONObject
 import java.net.URL
-import java.text.DateFormat
 import java.text.NumberFormat
-import java.util.Date
 import java.util.Locale
-import java.util.TimeZone
 
 object UnitsUtils {
 
@@ -87,6 +84,30 @@ object UnitsUtils {
         ).toString()
     }
 
+    fun getLatLngFromLocation(context: Context, location: String): LatLng{
+        val address = getAddressFromLocation(context, location)
+
+        return LatLng(address?.latitude ?: 0.0, address?.longitude ?: 0.0)
+
+    }
+
+    private fun getAddressFromLocation(context: Context, location: String): Address? {
+
+        var address: Address? = null
+        val geocoder = Geocoder(context, getCurrentLocale())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            geocoder.getFromLocationName(location, 1) { addresses ->
+                address = addresses[0]
+            }
+        } else {
+            try {
+                geocoder.getFromLocationName(location, 1)?.get(0)?.let { address = it }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        return address
+    }
 
     private fun getAddressFromLatAndLon(context: Context, lat: Double, lon: Double): Address? {
         var address: Address? = null
@@ -96,7 +117,12 @@ object UnitsUtils {
                 address = addresses[0]
             }
         } else {
-            geocoder.getFromLocation(lat, lon, 1)?.get(0)?.let { address = it }
+            try {
+
+                geocoder.getFromLocation(lat, lon, 1)?.get(0)?.let { address = it }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
         return address
     }
