@@ -46,8 +46,8 @@
     <string name="dialog_msg">Use GPS to automatically get your location or pick one from the map</string>
     <string name="add_to_favorites">Add To favorites</string>
     <string name="no_locations_msg">No Saved Locations yet Use below button to add new</string>
-    <string name="open_nav">openDrawer</string>
-    <string name="close_nav">closeDrawer</string>
+    <string name="open_nav" translatable="false">openDrawer</string>
+    <string name="close_nav" translatable="false">closeDrawer</string>
     <string name="no_alerts_msg">No Active Alerts</string>
     <string name="add_new_alert">Add New Alert</string>
     <string name="save">Save</string>
@@ -56,15 +56,25 @@
     <string name="from">From</string>
     <string name="to">To</string>
     <string name="pick_a_date">Pick a Date</string>
-    <string name="alerts_channel_name">Alerts Channel</string>
-    <string name="alerts_channel_description">This channel is used for sending alerts for weather</string>
+    <string name="alerts_channel_name" translatable="false">Alerts Channel</string>
+    <string name="alerts_channel_description" translatable="false">This channel is used for sending alerts for weather</string>
     <string name="no_alerts_description">Everything is fine during the specified period</string>
-    <string name="alert_title_key">alertTitle</string>
-    <string name="alert_description_key">alertDescription</string>
-    <string name="alert_type_key">alertType</string>
-    <string name="alert_id_key">alertId</string>
-    <string name="alert_Item_key">alertItemKey</string>
+    <string name="alert_title_key" translatable="false">alertTitle</string>
+    <string name="alert_description_key" translatable="false">alertDescription</string>
+    <string name="alert_type_key" translatable="false">alertType</string>
+    <string name="alert_id_key" translatable="false">alertId</string>
+    <string name="alert_Item_key" translatable="false">alertItemKey</string>
     <string name="stop_alarm">Stop Alarm</string>
     <string name="pick_a_location">Pick Location</string>
     <string name="today">Today</string>
+    <string name="item_deleted">Item Deleted</string>
+    <string name="undo">Undo</string>
+    <string name="select_start_date">Select Start Date</string>
+    <string name="select_end_date">Select End Date</string>
+    <string name="select_time">Select Time</string>
+    <string name="select_dates_warning"><![CDATA[Please Choose Start & End Dates]]></string>
+    <string name="invalid_date_range">Start Must be before End</string>
+    <string name="alert_scheduled">Alert Scheduled to</string>
+    <string name="enable">Enable</string>
+    <string name="no_internet_msg">No Internet</string>
 </resources>

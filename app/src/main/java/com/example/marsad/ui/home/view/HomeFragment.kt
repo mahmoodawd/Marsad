@@ -127,7 +127,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             putBoolean(getString(R.string.is_having_location_key), isHaveLocation)
             apply()
         }
-        Log.i("HomeFragment", "saveLocationToSharedPrefs: lat: $lat, lon:$lon")
     }
 
     private fun readDataFromSharedPrefs() {
@@ -149,7 +148,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 ?.toDouble() ?: 0.0
 
         isFirstUse = sharedPreferences.getBoolean(getString(R.string.first_use_key), true)
-        println("####isFirstUse: $isFirstUse")
 
         isHaveLocation =
             sharedPreferences.getBoolean(getString(R.string.is_having_location_key), false)
@@ -191,7 +189,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 when (result) {
                     is ApiState.Loading -> {
                         binding.loadingBar.visibility = View.VISIBLE
-                        Toast.makeText(requireContext(), "Fetching......", Toast.LENGTH_LONG).show()
                     }
                     is ApiState.Success<*> -> {
                         binding.loadingBar.visibility = View.GONE
@@ -200,8 +197,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                     }
                     else -> {
                         binding.loadingBar.visibility = View.GONE
-                        Toast.makeText(requireContext(), "Failed To Fetch Data", Toast.LENGTH_SHORT)
-                            .show()
+                        /* Toast.makeText(requireContext(), "Failed To Fetch Data", Toast.LENGTH_SHORT)
+                             .show()*/
                     }
                 }
             }
@@ -365,7 +362,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        Toast.makeText(requireContext(), "onMapReady", Toast.LENGTH_SHORT).show()
         mMap = googleMap
         mMap.setOnMapClickListener {
             MarkerOptions().apply {

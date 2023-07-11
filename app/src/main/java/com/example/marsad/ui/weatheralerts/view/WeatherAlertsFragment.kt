@@ -121,7 +121,6 @@ class WeatherAlertsFragment : Fragment() {
     }
 
     private fun collectAlertsResponse() {
-        Toast.makeText(requireContext(), "Collecting Alerts", Toast.LENGTH_SHORT).show()
         lifecycleScope.launch {
             viewModel.weatherAlertsStateFlow.collect { result ->
                 when (result) {
@@ -169,7 +168,6 @@ class WeatherAlertsFragment : Fragment() {
                 putExtra(getString(R.string.alert_description_key), alertItem.description)
                 putExtra(getString(R.string.alert_type_key), alertItem.alertType)
             }
-        println("Fragment--------****${alertItem.alertType}")
         val pendingIntent = PendingIntent.getBroadcast(
             requireActivity().applicationContext, 1, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT
         )
@@ -181,7 +179,7 @@ class WeatherAlertsFragment : Fragment() {
         )
         Toast.makeText(
             requireContext(),
-            "Alert Scheduled to \n${getDateAndTime(alertItem.start / 1000)}",
+            "${getString(R.string.alert_scheduled)} \n${getDateAndTime(alertItem.start / 1000)}",
             Toast.LENGTH_LONG
         ).show()
 

@@ -75,8 +75,8 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
             viewModel.removeLocation(deletedLocation)
 
             Snackbar.make(
-                binding.savedLocationsRv, "Deleted " + deletedLocation.city, Snackbar.LENGTH_LONG
-            ).setAction("Undo") {
+                binding.savedLocationsRv, getString(R.string.item_deleted), Snackbar.LENGTH_LONG
+            ).setAction(getString(R.string.undo)) {
                 viewModel.addLocation(deletedLocation)
             }.show()
         }

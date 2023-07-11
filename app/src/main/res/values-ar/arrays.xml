@@ -22,6 +22,7 @@
     <string-array name="language_entries">
         <item>الإنجليزية</item>
         <item>العربية</item>
+        <item>لغة الهاتف</item>
     </string-array>
 
 </resources>

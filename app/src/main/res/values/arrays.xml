@@ -36,10 +36,13 @@
     <string-array name="language_entries">
         <item>English</item>
         <item>Arabic</item>
+        <item>Same As System</item>
     </string-array>
 
     <string-array name="language_values">
         <item>english</item>
         <item>arabic</item>
+        <item>system</item>
+
     </string-array>
 </resources>

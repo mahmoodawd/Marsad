@@ -29,7 +29,6 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import java.util.*
-import kotlin.time.Duration.Companion.days
 
 class ModalBottomSheet : BottomSheetDialogFragment() {
     private lateinit var binding: BottomSheetLayoutBinding
@@ -77,11 +76,11 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
 
     private fun showDatePicker(target: String) {
         val today = MaterialDatePicker.todayInUtcMilliseconds()
-        val myCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        val myCalendar = Calendar.getInstance(TimeZone.getTimeZone(TimeZone.getAvailableIDs()[0]))
         myCalendar.timeInMillis = today
         val thisMonth = myCalendar.timeInMillis
         val calendarConstraints = CalendarConstraints.Builder()
-            .setStart(thisMonth)
+            .setStart(thisMonth).setFirstDayOfWeek(Calendar.SATURDAY)
             .setValidator(DateValidatorPointForward.now())
 
         val datePicker =
@@ -90,8 +89,8 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
                 .setSelection(calendar.timeInMillis)
                 .setTitleText(
                     when (target) {
-                        "start" -> "Select Start Date"
-                        else -> "Select End Date"
+                        "start" -> R.string.select_start_date
+                        else -> R.string.select_end_date
                     }
                 )
                 .build()
@@ -111,7 +110,7 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
                 .setTimeFormat(TimeFormat.CLOCK_12H)
                 .setHour(calendar[Calendar.HOUR_OF_DAY])
                 .setMinute(calendar[Calendar.MINUTE])
-                .setTitleText("Select Start Time ")
+                .setTitleText(R.string.select_time)
                 .build()
         picker.addOnPositiveButtonClickListener {
             calendar[Calendar.HOUR_OF_DAY] = picker.hour
@@ -133,10 +132,10 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
     private fun addNewAlert() {
 
         if (startDate.toInt() == 0 || endDate.toInt() == 0) {
-            Toast.makeText(requireContext(), "Please Choose Start & End Dates", Toast.LENGTH_SHORT)
+            Toast.makeText(requireContext(), R.string.select_dates_warning, Toast.LENGTH_SHORT)
                 .show()
         } else if (startDate > endDate) {
-            Toast.makeText(requireContext(), "Start Must be before End", Toast.LENGTH_SHORT)
+            Toast.makeText(requireContext(), R.string.invalid_date_range, Toast.LENGTH_SHORT)
                 .show()
         } else {
             val currentAlert =

@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.security.DigestInputStream
 
 class WeatherAlertsViewModel(private val repository: AlertsRepositoryInterface) : ViewModel() {
     private val TAG = WeatherAlertsViewModel::class.java.simpleName
@@ -56,7 +58,9 @@ class WeatherAlertsViewModel(private val repository: AlertsRepositoryInterface) 
         val status = MutableLiveData<Boolean>()
         viewModelScope.launch(Dispatchers.IO) {
             val st = repository.addNewAlert(alert)
-            status.value = st > 0
+            withContext(Dispatchers.Main) {
+                status.value = st > 0
+            }
         }
         return status
     }
@@ -65,7 +69,10 @@ class WeatherAlertsViewModel(private val repository: AlertsRepositoryInterface) 
         val status = MutableLiveData<Boolean>()
         viewModelScope.launch(Dispatchers.IO) {
             val st = repository.deleteAlert(alert)
-            status.value = st > 0
+            withContext(Dispatchers.Main) {
+
+                status.value = st > 0
+            }
         }
         return status
     }
