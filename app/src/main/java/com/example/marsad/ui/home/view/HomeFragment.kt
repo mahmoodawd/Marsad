@@ -61,7 +61,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private lateinit var homeContent: View
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var binding: FragmentHomeBinding
-    val homeViewModel by lazy {
+    private val homeViewModel by lazy {
         val homeViewModelFactory = MyViewModelFactory(
             WeatherDetailsRepository.getInstance(
                 WeatherRemoteDataSource, WeatherDetailsLocalDataSource(requireContext())

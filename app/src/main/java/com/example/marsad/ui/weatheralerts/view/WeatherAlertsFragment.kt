@@ -27,9 +27,9 @@ import com.example.marsad.data.network.ApiState
 import com.example.marsad.data.network.WeatherRemoteDataSource
 import com.example.marsad.data.repositories.AlertsRepository
 import com.example.marsad.databinding.FragmentWeatherAlertsBinding
+import com.example.marsad.ui.utils.MyViewModelFactory
 import com.example.marsad.ui.utils.getDateAndTime
 import com.example.marsad.ui.weatheralerts.AlertReceiver
-import com.example.marsad.ui.weatheralerts.viewmodel.AlertViewModelFactory
 import com.example.marsad.ui.weatheralerts.viewmodel.WeatherAlertsViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -37,8 +37,17 @@ import kotlinx.coroutines.launch
 class WeatherAlertsFragment : Fragment() {
     lateinit var binding: FragmentWeatherAlertsBinding
     lateinit var alertItemAdapter: AlertItemAdapter
-    lateinit var viewModel: WeatherAlertsViewModel
     private var alarmManager: AlarmManager? = null
+    private val viewModel by lazy {
+        val factory = MyViewModelFactory(
+            AlertsRepository.getInstance(
+                WeatherRemoteDataSource,
+                AlertLocalDataSource(requireContext())
+            )
+        )
+        ViewModelProvider(requireActivity(), factory)[WeatherAlertsViewModel::class.java]
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -53,7 +62,6 @@ class WeatherAlertsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpAdapter()
-        setUpViewModel()
         getActiveAlerts()
         collectAlertsResponse()
 
@@ -117,16 +125,6 @@ class WeatherAlertsFragment : Fragment() {
         }
     }
 
-    private fun setUpViewModel() {
-        val factory = AlertViewModelFactory(
-            AlertsRepository.getInstance(
-                WeatherRemoteDataSource,
-                AlertLocalDataSource(requireContext())
-            )
-        )
-        viewModel =
-            ViewModelProvider(requireActivity(), factory)[WeatherAlertsViewModel::class.java]
-    }
 
     private fun setUpAdapter() {
         alertItemAdapter = AlertItemAdapter(listOf(), requireContext())

@@ -19,8 +19,8 @@ import com.example.marsad.data.model.AlertType
 import com.example.marsad.data.network.WeatherRemoteDataSource
 import com.example.marsad.data.repositories.AlertsRepository
 import com.example.marsad.databinding.BottomSheetLayoutBinding
+import com.example.marsad.ui.utils.MyViewModelFactory
 import com.example.marsad.ui.utils.getDateAndTime
-import com.example.marsad.ui.weatheralerts.viewmodel.AlertViewModelFactory
 import com.example.marsad.ui.weatheralerts.viewmodel.WeatherAlertsViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.datepicker.CalendarConstraints
@@ -34,7 +34,15 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
     private lateinit var binding: BottomSheetLayoutBinding
     private var startDate: Long = 0
     private var endDate: Long = 0
-    lateinit var viewModel: WeatherAlertsViewModel
+    private val viewModel by lazy {
+        val factory = MyViewModelFactory(
+            AlertsRepository.getInstance(
+                WeatherRemoteDataSource,
+                AlertLocalDataSource(requireContext())
+            )
+        )
+        ViewModelProvider(requireActivity(), factory)[WeatherAlertsViewModel::class.java]
+    }
     private var calendar = Calendar.getInstance()
 
     companion object {
@@ -59,7 +67,7 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
             }
         }
         setButtonsClickListeners()
-        setUpViewModel()
+
     }
 
     private fun setButtonsClickListeners() {
@@ -192,16 +200,6 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
 
     }
 
-    private fun setUpViewModel() {
-        val factory = AlertViewModelFactory(
-            AlertsRepository.getInstance(
-                WeatherRemoteDataSource,
-                AlertLocalDataSource(requireContext())
-            )
-        )
-        viewModel =
-            ViewModelProvider(requireActivity(), factory)[WeatherAlertsViewModel::class.java]
-    }
 
     private fun getAlertType() = when (binding.radioGroup.checkedRadioButtonId) {
         binding.radioButtonNotification.id -> AlertType.NOTIFICATION
