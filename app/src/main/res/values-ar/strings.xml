@@ -32,7 +32,7 @@
     <string name="language">اللغة</string>
     <string name="english">الإنجليزية</string>
     <string name="arabic">العربية</string>
-    <string name="feels_like">تبدو</string>
+    <string name="feels_like"> تبدو كأنها</string>
     <string name="fahrenheit_suffix">°</string>
     <string name="kelvin_suffix">°</string>
     <string name="add_to_favorites">إضافة إلى المفضلة</string>

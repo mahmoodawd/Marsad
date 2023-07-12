@@ -21,7 +21,9 @@ class FavoritesViewModel(private val repository: LocationRepositoryInterface) : 
     private val _locationWeatherStateFlow: MutableStateFlow<ApiState> =
         MutableStateFlow(ApiState.Loading)
     val locationWeatherStateFlow: StateFlow<ApiState> = _locationWeatherStateFlow
-
+    private val _weatherDataStateFlow: MutableStateFlow<ApiState> =
+        MutableStateFlow(ApiState.Loading)
+    val weatherDataStateFlow: StateFlow<ApiState> = _weatherDataStateFlow
 
     fun getSavedLocations(): MutableLiveData<List<SavedLocation>> {
         val locationList = MutableLiveData<List<SavedLocation>>()
@@ -53,6 +55,17 @@ class FavoritesViewModel(private val repository: LocationRepositoryInterface) : 
                 _locationWeatherStateFlow.value = ApiState.Failure(e)
             }.collect {
                 _locationWeatherStateFlow.value = ApiState.Success(it)
+            }
+        }
+    }
+
+    fun getWeatherStatus(lat: Double, lon: Double, forceUpdate: Boolean = true) {
+        viewModelScope.launch {
+            repository.getWeatherDetails(lat, lon, forceUpdate).catch { e ->
+                _weatherDataStateFlow.value = ApiState.Failure(e)
+                Log.i(TAG, "getWeatherStatus: Failed: ${e.message}")
+            }.collect { weatherData ->
+                _weatherDataStateFlow.value = ApiState.Success(weatherData)
             }
         }
     }

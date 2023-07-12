@@ -25,7 +25,7 @@
         android:theme="@style/Theme.AppStarting"
         tools:targetApi="tiramisu">
         <receiver
-            android:name=".ui.utils.ConnectivityReceiver"
+            android:name=".utils.ConnectivityReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -43,7 +43,7 @@
         <activity
             android:name=".ui.AlarmActivity"
             android:exported="false"
-            android:theme="@style/Theme.AppStarting">
+            android:theme="@style/Theme.Marsad">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -63,7 +63,7 @@
         </activity>
 
         <receiver
-            android:name=".ui.weatheralerts.AlertReceiver"
+            android:name=".utils.AlertReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

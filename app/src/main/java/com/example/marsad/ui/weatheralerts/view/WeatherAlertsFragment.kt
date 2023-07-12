@@ -6,6 +6,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.os.Build.VERSION
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
@@ -27,9 +29,9 @@ import com.example.marsad.data.network.ApiState
 import com.example.marsad.data.network.WeatherRemoteDataSource
 import com.example.marsad.data.repositories.AlertsRepository
 import com.example.marsad.databinding.FragmentWeatherAlertsBinding
-import com.example.marsad.ui.utils.MyViewModelFactory
-import com.example.marsad.ui.utils.getDateAndTime
-import com.example.marsad.ui.weatheralerts.AlertReceiver
+import com.example.marsad.utils.MyViewModelFactory
+import com.example.marsad.utils.getDateAndTime
+import com.example.marsad.utils.AlertReceiver
 import com.example.marsad.ui.weatheralerts.viewmodel.WeatherAlertsViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -73,6 +75,7 @@ class WeatherAlertsFragment : Fragment() {
         setSwipeBehaviour()
 
     }
+
     @SuppressLint("BatteryLife")
     private fun requestBatteryOptimizationPermission() {
         val packageName = requireActivity().packageName
@@ -139,8 +142,11 @@ class WeatherAlertsFragment : Fragment() {
 
 
     private fun showBottomSheet() {
-        val modalBottomSheet = ModalBottomSheet()
-        modalBottomSheet.show(requireActivity().supportFragmentManager, ModalBottomSheet.TAG)
+        val addNewAlertBottomSheet = AddNewAlertBottomSheet()
+        addNewAlertBottomSheet.show(
+            requireActivity().supportFragmentManager,
+            AddNewAlertBottomSheet.TAG
+        )
 
     }
 
@@ -192,8 +198,12 @@ class WeatherAlertsFragment : Fragment() {
                 putExtra(getString(R.string.alert_description_key), alertItem.description)
                 putExtra(getString(R.string.alert_type_key), alertItem.alertType)
             }
+        val pendingIntentFlag = when (VERSION.SDK_INT) {
+            Build.VERSION_CODES.TIRAMISU -> PendingIntent.FLAG_IMMUTABLE
+            else -> PendingIntent.FLAG_UPDATE_CURRENT
+        }
         val pendingIntent = PendingIntent.getBroadcast(
-            requireActivity().applicationContext, 1, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT
+            requireActivity().applicationContext, 1, alarmIntent, pendingIntentFlag
         )
         alertItem.pendingIntent = pendingIntent
         alarmManager?.set(

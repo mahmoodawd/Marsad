@@ -29,5 +29,6 @@
         <item name="colorPrimaryInverse">@color/md_theme_dark_inversePrimary</item>
         <item name="android:statusBarColor">@color/md_theme_light_primary</item>
         <item name="android:navigationBarColor">#1b2746</item>
+        <item name="dialogCornerRadius">12dp</item>
     </style>
 </resources>

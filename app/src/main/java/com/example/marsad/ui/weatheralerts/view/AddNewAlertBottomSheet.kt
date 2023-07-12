@@ -19,8 +19,8 @@ import com.example.marsad.data.model.AlertType
 import com.example.marsad.data.network.WeatherRemoteDataSource
 import com.example.marsad.data.repositories.AlertsRepository
 import com.example.marsad.databinding.BottomSheetLayoutBinding
-import com.example.marsad.ui.utils.MyViewModelFactory
-import com.example.marsad.ui.utils.getDateAndTime
+import com.example.marsad.utils.MyViewModelFactory
+import com.example.marsad.utils.getDateAndTime
 import com.example.marsad.ui.weatheralerts.viewmodel.WeatherAlertsViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.datepicker.CalendarConstraints
@@ -30,7 +30,7 @@ import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import java.util.*
 
-class ModalBottomSheet : BottomSheetDialogFragment() {
+class AddNewAlertBottomSheet : BottomSheetDialogFragment() {
     private lateinit var binding: BottomSheetLayoutBinding
     private var startDate: Long = 0
     private var endDate: Long = 0
@@ -151,7 +151,7 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
             viewModel.addAlert(currentAlert)
             getWeatherAlerts()
 
-            this@ModalBottomSheet.dismiss()
+            this@AddNewAlertBottomSheet.dismiss()
         }
     }
 

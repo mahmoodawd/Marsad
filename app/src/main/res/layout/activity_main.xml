@@ -20,6 +20,8 @@
             android:layout_height="?attr/actionBarSize"
             android:layout_margin="8dp"
             android:background="@drawable/full_circular_gradient_bg"
+            app:navigationIcon="@drawable/ic_list_24"
+            app:navigationIconTint="@color/md_theme_light_onPrimary"
             app:titleCentered="true"
             app:titleTextColor="@color/md_theme_light_onPrimary" />
 

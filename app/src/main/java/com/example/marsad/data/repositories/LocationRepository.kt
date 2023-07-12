@@ -41,4 +41,14 @@ class LocationRepository private constructor(
 
     override suspend fun deleteLocation(savedLocation: SavedLocation) =
         localSource.deleteItem(savedLocation)
+
+    override suspend fun getWeatherDetails(
+        lat: Double,
+        lon: Double,
+        forceUpdate: Boolean
+    ): Flow<WeatherDetailsResponse> = flow {
+        emit(
+            remoteSource.getWeatherStatus(lat, lon).body()
+        )
+    }.flowOn(Dispatchers.IO) as Flow<WeatherDetailsResponse>
 }

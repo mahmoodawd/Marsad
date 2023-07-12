@@ -4,6 +4,7 @@
 
     <PreferenceCategory app:title="@string/general">
         <ListPreference
+            android:dialogTitle="@string/location_method"
             app:entries="@array/location_method_entries"
             app:entryValues="@array/location_method_values"
             app:icon="@drawable/ic_map_24"
@@ -24,6 +25,7 @@
     <PreferenceCategory app:title="@string/units">
         <ListPreference
             app:defaultValue="celsius"
+            app:dialogTitle="@string/temperature"
             app:entries="@array/temp_entries"
             app:entryValues="@array/temp_values"
             app:icon="@drawable/ic_device_thermostat"
@@ -32,6 +34,7 @@
             app:useSimpleSummaryProvider="true" />
         <ListPreference
             app:defaultValue="meter_second"
+            app:dialogTitle="@string/wind_speed"
             app:entries="@array/wind_speed_entries"
             app:entryValues="@array/wind_speed_values"
             app:icon="@drawable/ic_air_24"
@@ -44,11 +47,12 @@
     <ListPreference
         app:allowDividerAbove="true"
         app:defaultValue="system"
+        app:dialogTitle="@string/language"
         app:entries="@array/language_entries"
         app:entryValues="@array/language_values"
         app:icon="@drawable/ic_language"
-        app:key="@string/language_key"
         app:title="@string/language"
+        android:key="@string/language_key"
         app:useSimpleSummaryProvider="true" />
 
 

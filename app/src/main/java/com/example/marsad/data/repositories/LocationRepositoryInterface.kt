@@ -12,4 +12,10 @@ interface LocationRepositoryInterface {
     fun getSavedLocations(): Flow<List<SavedLocation>>
     suspend fun addLocation(savedLocation: SavedLocation): Long
     suspend fun deleteLocation(savedLocation: SavedLocation): Int
+    suspend fun getWeatherDetails(
+        lat: Double,
+        lon: Double,
+        forceUpdate: Boolean = true
+    ): Flow<WeatherDetailsResponse>
+
 }

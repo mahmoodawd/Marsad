@@ -12,7 +12,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.marsad.R
 import com.example.marsad.databinding.ActivityMainBinding
-import com.example.marsad.ui.utils.ConnectivityReceiver
+import com.example.marsad.utils.ConnectivityReceiver
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {

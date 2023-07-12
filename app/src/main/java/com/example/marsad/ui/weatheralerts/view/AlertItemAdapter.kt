@@ -8,8 +8,8 @@ import com.example.marsad.R
 import com.example.marsad.data.model.AlertItem
 import com.example.marsad.data.model.AlertType
 import com.example.marsad.databinding.AlertItemBinding
-import com.example.marsad.ui.utils.getDate
-import com.example.marsad.ui.utils.getDateAndTime
+import com.example.marsad.utils.getDate
+import com.example.marsad.utils.getDateAndTime
 
 class AlertItemAdapter(
     alertItems: List<AlertItem>,
@@ -38,8 +38,8 @@ class AlertItemAdapter(
             if (currentAlert.alertType == AlertType.ALARM) R.drawable.ic_alarm_24
             else R.drawable.ic_alert_24
 
-        holder.binding.startTimeTv.text = getDate(currentAlert.start)
-        holder.binding.endTimeTv.text = getDate(currentAlert.end)
+        holder.binding.startTimeTv.text = getDateAndTime(currentAlert.start / 1000)
+        holder.binding.endTimeTv.text = getDateAndTime(currentAlert.end / 1000)
         holder.binding.alarmTypeIcon.setImageResource(alertIcon)
     }
 

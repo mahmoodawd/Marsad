@@ -30,16 +30,10 @@ import com.example.marsad.databinding.FragmentHomeBinding
 import com.example.marsad.ui.home.view.adapters.DayAdapter
 import com.example.marsad.ui.home.view.adapters.HourAdapter
 import com.example.marsad.ui.home.viewmodel.HomeViewModel
-import com.example.marsad.ui.utils.MyViewModelFactory
-import com.example.marsad.ui.utils.UnitsUtils
-import com.example.marsad.ui.utils.getFullDateAndTime
-import com.example.marsad.ui.utils.getHour
+import com.example.marsad.utils.*
 import com.google.android.gms.location.*
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
@@ -50,7 +44,7 @@ private const val My_LOCATION_PERMISSION_ID = 5005
 private const val DEFAULT_LATITUDE = 26.8206
 private const val DEFAULT_LONGITUDE = 30.8025
 
-class HomeFragment : Fragment(), OnMapReadyCallback {
+class HomeFragment : Fragment() {
     private lateinit var weatherResponse: WeatherDetailsResponse
     private var isHaveLocation = false
     private var isFirstUse = true
@@ -106,8 +100,16 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         val mapFragment =
             childFragmentManager.findFragmentById(R.id.googleMapView) as SupportMapFragment
 
-
-        mapFragment.getMapAsync(this)
+        MapListener(
+            requireContext(),
+        ) {
+            lat = it.latitude
+            lon = it.longitude
+            changeConfirmBtnStatus()
+        }.apply {
+            mapFragment.getMapAsync(this)
+            binding.mapView.searchView.setOnQueryTextListener(this)
+        }
         readDataFromSharedPrefs()
         setupAdapters()
         getWeatherDetails()
@@ -157,7 +159,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         isHaveLocation =
             sharedPreferences.getBoolean(getString(R.string.is_having_location_key), false)
     }
-
 
 
     private fun setupAdapters() {
@@ -242,9 +243,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
                 minMaxTv.text = StringBuilder().append(minTemp, "/", maxTemp)
 
-                feelsLikeTv.text =
+                feelsLikeTv.text = StringBuilder().append(
+                    getString(R.string.feels_like), " ",
                     UnitsUtils.getTempRepresentation(requireContext(), it.feels_like)
-
+                )
             }
 
             propertiesCard.apply {
@@ -362,25 +364,16 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-        mMap.setOnMapClickListener {
-            MarkerOptions().apply {
-                position(it)
-                mMap.clear()
-                mMap.addMarker(this)
-            }
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(it, 10.0F))
-            lat = it.latitude
-            lon = it.longitude
-            binding.mapView.confirmFab.apply {
-                text =
-                    UnitsUtils.getCity(requireContext(), lat, lon)
-                icon = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_check)
-            }
+    private fun changeConfirmBtnStatus() {
+        binding.mapView.confirmFab.apply {
+            text =
+                UnitsUtils.getCity(requireContext(), lat, lon)
+            icon = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_check)
+
+            setBackgroundColor(resources.getColor(R.color.md_theme_light_primary))
+            setTextColor(resources.getColor(R.color.md_theme_dark_onBackground))
 
         }
-
     }
 
 

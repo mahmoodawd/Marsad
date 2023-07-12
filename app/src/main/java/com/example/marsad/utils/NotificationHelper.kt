@@ -1,6 +1,5 @@
-package com.example.marsad.ui.weatheralerts
+package com.example.marsad.utils
 
-import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -8,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.annotation.WorkerThread
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import com.example.marsad.R
 import com.example.marsad.ui.AlarmActivity
 import com.example.marsad.ui.MainActivity

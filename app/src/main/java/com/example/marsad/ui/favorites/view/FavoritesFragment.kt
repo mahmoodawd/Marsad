@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
@@ -26,24 +25,20 @@ import com.example.marsad.data.repositories.LocationRepository
 import com.example.marsad.databinding.FragmentFavoritesBinding
 import com.example.marsad.ui.favorites.viewmodel.FavoritesViewModel
 import com.example.marsad.ui.favorites.viewmodel.SharedViewModel
-import com.example.marsad.ui.utils.MyViewModelFactory
-import com.example.marsad.ui.utils.UnitsUtils
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
+import com.example.marsad.utils.MyViewModelFactory
+import com.example.marsad.utils.MapListener
+import com.example.marsad.utils.UnitsUtils
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
-class FavoritesFragment : Fragment(), OnMapReadyCallback {
+class FavoritesFragment : Fragment() {
     private val sharedViewModel: SharedViewModel by activityViewModels()
     private var locationLat: Double = 0.0
     private var locationLon: Double = 0.0
     private lateinit var binding: FragmentFavoritesBinding
     private lateinit var viewModel: FavoritesViewModel
     private lateinit var locationItemAdapter: LocationItemAdapter
-    private lateinit var mMap: GoogleMap
     private lateinit var mapView: View
 
     override fun onCreateView(
@@ -58,7 +53,6 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.map_view)
         val mapFragment =
             childFragmentManager.findFragmentById(R.id.googleMapView) as SupportMapFragment
-        mapFragment.getMapAsync(this)
 
         initUI(view)
         setUpViewModel()
@@ -66,22 +60,29 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
         setClickListeners()
         setSwipeBehaviour()
 
-        binding.mapView.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
+        MapListener(
+            requireContext(),
+        ) {
+            locationLat = it.latitude
+            locationLon = it.longitude
+            changeConfirmBtnStatus()
+        }.run {
+            mapFragment.getMapAsync(this)
+            binding.mapView.searchView.setOnQueryTextListener(this)
+        }
 
-                val location = binding.mapView.searchView.query.toString()
+    }
 
-                val latLon = UnitsUtils.getLatLngFromLocation(requireContext(), location)
-                mMap.addMarker(MarkerOptions().position(latLon).title(location))
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLon, 10.0f))
+    private fun changeConfirmBtnStatus() {
+        binding.mapView.confirmFab.apply {
+            text =
+                UnitsUtils.getCity(requireContext(), locationLat, locationLon)
+            icon = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_check)
 
-                return false
-            }
+            setBackgroundColor(resources.getColor(R.color.md_theme_light_primary))
+            setTextColor(resources.getColor(R.color.md_theme_dark_onBackground))
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                return false
-            }
-        })
+        }
     }
 
     private fun setClickListeners() {
@@ -92,7 +93,7 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
             (requireActivity() as AppCompatActivity).supportActionBar?.hide()
         }
         binding.mapView.confirmFab.setOnClickListener {
-            addNewLocation()
+            saveLocation()
         }
     }
 
@@ -123,7 +124,7 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
                     }
                     is ApiState.Success<*> -> {
                         val weatherInfo = result.weatherStatus as OpenWeatherMapResponse
-                        saveLocation(weatherInfo)
+//                        saveLocation(weatherInfo)
                         mapView.visibility = View.GONE
                         binding.addToFavFab.visibility = View.VISIBLE
                         binding.savedLocationsRv.visibility = View.VISIBLE
@@ -140,7 +141,7 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun saveLocation(weatherInfo: OpenWeatherMapResponse) {
+    private fun saveLocation() {
         val myLocation = SavedLocation(
             city = UnitsUtils.getCity(
                 requireContext(), locationLat, locationLon
@@ -148,11 +149,15 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
 
             lat = locationLat,
             lon = locationLon,
-            description = weatherInfo.weather[0].description,
-            icon = weatherInfo.weather[0].icon,
-            lastTemp = weatherInfo.main.temp.toInt()
+            /* description = weatherInfo.weather[0].description,
+             icon = weatherInfo.weather[0].icon,
+             lastTemp = weatherInfo.main.temp.toInt()*/
         )
         viewModel.addLocation(myLocation)
+        mapView.visibility = View.GONE
+        binding.addToFavFab.visibility = View.VISIBLE
+        binding.savedLocationsRv.visibility = View.VISIBLE
+        (requireActivity() as AppCompatActivity).supportActionBar?.show()
     }
 
     private fun getLocations() {
@@ -194,24 +199,4 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-        mMap.setOnMapClickListener {
-            MarkerOptions().apply {
-                position(it)
-                mMap.clear()
-                mMap.addMarker(this)
-            }
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(it, 10.0F))
-            locationLat = it.latitude
-            locationLon = it.longitude
-            binding.mapView.confirmFab.apply {
-                text =
-                    UnitsUtils.getCity(requireContext(), locationLat, locationLon)
-                icon = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_check)
-            }
-
-            viewModel.getLocationWeather(it.latitude, it.longitude)
-        }
-    }
 }

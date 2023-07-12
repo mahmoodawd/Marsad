@@ -7,8 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.marsad.R
 import com.example.marsad.data.model.SavedLocation
 import com.example.marsad.databinding.LocationItemBinding
-import com.example.marsad.ui.utils.UnitsUtils
-import com.example.marsad.ui.utils.getLocalTime
+import com.example.marsad.utils.UnitsUtils
+import com.example.marsad.utils.getLocalTime
 import com.squareup.picasso.Picasso
 
 class LocationItemAdapter(
@@ -43,7 +43,7 @@ class LocationItemAdapter(
         holder.binding.dataTimeTv.text =
             getLocalTime(currentLocation.lat, currentLocation.lon)
         holder.binding.weatherConditionTv.text = currentLocation.description
-        Picasso.get().load(iconUrl).into(holder.binding.weatherIcon)
+//        Picasso.get().load(iconUrl).into(holder.binding.weatherIcon)
 
         holder.binding.locationCard.setOnClickListener {
             onItemClick(currentLocation)

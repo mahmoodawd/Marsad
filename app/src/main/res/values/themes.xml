@@ -28,8 +28,10 @@
         <item name="colorOnSurfaceVariant">@color/md_theme_light_onSurfaceVariant</item>
         <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
         <item name="android:navigationBarColor">#1b2746</item>
-        <item name="preferenceCategoryTitleTextColor">@color/md_theme_light_inversePrimary</item>
-        <item name="android:textColor">@color/md_theme_light_surface</item>
+        <item name="preferenceCategoryTitleTextColor">?colorPrimaryInverse</item>
+        <item name="android:textColor">@color/md_theme_light_onSurface</item>
+        <item name="dialogCornerRadius">12dp</item>
+        <item name="android:titleTextColor">#1b2746</item>
     </style>
 
 
