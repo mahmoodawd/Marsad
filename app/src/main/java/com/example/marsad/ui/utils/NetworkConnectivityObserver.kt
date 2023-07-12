@@ -6,7 +6,12 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.withContext
 
 class NetworkConnectivityObserver(context: Context) {
     private val connectivityManager =
@@ -26,6 +31,7 @@ class NetworkConnectivityObserver(context: Context) {
                 super.onAvailable(network)
                 _netState.value = Status.Available
             }
+
 
             override fun onUnavailable() {
                 super.onUnavailable()

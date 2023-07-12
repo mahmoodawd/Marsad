@@ -24,6 +24,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppStarting"
         tools:targetApi="tiramisu">
+        <receiver
+            android:name=".ui.utils.ConnectivityReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action
+                    android:name="android.net.conn.CONNECTIVITY_CHANGE"
+                    tools:ignore="BatteryLife" />
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -37,7 +48,6 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-
         <activity
             android:name=".ui.MainActivity"
             android:exported="true">
