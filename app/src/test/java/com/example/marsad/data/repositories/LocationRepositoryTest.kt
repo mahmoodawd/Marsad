@@ -3,17 +3,14 @@ package com.example.marsad.data.repositories
 import com.example.marsad.data.database.localdatasources.FakeLocationLocalDataSource
 import com.example.marsad.data.model.SavedLocation
 import com.example.marsad.data.network.FakeWeatherRemoteDataSource
-import com.example.marsad.data.network.OneCallResponse
+import com.example.marsad.data.network.WeatherDetailsResponse
 import com.example.marsad.data.network.OpenWeatherMapResponse
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.*
 
 import org.junit.Before
-import org.junit.BeforeClass
-import org.junit.Ignore
 import org.junit.Test
 
 class LocationRepositoryTest {
@@ -21,6 +18,9 @@ class LocationRepositoryTest {
     private lateinit var fakeWeatherRemoteDataSource: FakeWeatherRemoteDataSource
     private lateinit var fakeLocationLocalDataSource: FakeLocationLocalDataSource
     private var locationsList = FakeLocationLocalDataSource.savedLocations
+
+
+
 
     @Before
     fun setUp() {
@@ -71,16 +71,6 @@ class LocationRepositoryTest {
         }
     }
 
-    @Test
-    fun getWeatherDetails_locationLatAndLon_OneCallResponse() {
-        var response: OneCallResponse? = null
-        runTest {
-            repository.getWeatherDetails(30.0, 50.0).collect {
-                response = it
-            }
-            assertEquals(fakeWeatherRemoteDataSource.fakeOneCallResponse, response)
-        }
-    }
 
     @Test
     fun getLocationWeather_locationLatAndLon_openWeatherMapResponseNotnull() {

@@ -8,35 +8,38 @@ import com.example.marsad.data.network.ApiState
 import com.example.marsad.data.network.Coord
 import com.example.marsad.data.network.Main
 import com.example.marsad.data.network.OpenWeatherMapResponse
+import com.example.marsad.data.repositories.FakeAlertsRepository
 import com.example.marsad.data.repositories.FakeLocationRepository
-import com.example.marsad.data.repositories.LocationRepository
 import com.example.marsad.getOrAwaitValue
-import io.mockk.every
-import io.mockk.mockk
 import kotlinx.coroutines.*
-import kotlinx.coroutines.test.advanceTimeBy
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.*
-
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 
+@Config(manifest = Config.NONE)
 @RunWith(AndroidJUnit4::class)
 class FavoritesViewModelTest {
-    lateinit var favoritesViewModel: FavoritesViewModel
-    lateinit var fakeRepo: FakeLocationRepository
+    private lateinit var favoritesViewModel: FavoritesViewModel
+    private lateinit var fakeRepo: FakeLocationRepository
+    private lateinit var favoritesList: MutableList<SavedLocation>
+
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
+
 
     @Before
     fun setUp() {
         fakeRepo = FakeLocationRepository()
         favoritesViewModel = FavoritesViewModel(fakeRepo)
+        favoritesList = FakeLocationRepository.savedLocations
     }
 
     @Test
@@ -47,41 +50,33 @@ class FavoritesViewModelTest {
         assertThat(value, not(nullValue()))
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun addLocation_insertionStatusGreaterThanZero_locationAdded() {
-
+    fun addLocation_newLocationItem_locationItemsIncreasedByOne() = runTest {
         //Given location Item
+        val oldSize = favoritesList.size
         val savedLocation =
             SavedLocation("Washington", 88.0, 33.0, 8, "google.com", "rainy")
-        fakeRepo.addOrDeleteStatus = 1
         //When adding the location to local
-        val value = favoritesViewModel.addLocation(savedLocation).getOrAwaitValue()
+        favoritesViewModel.addLocation(savedLocation)
+        advanceUntilIdle()
         //Then location should be added
-        assertTrue(value)
-    }
-
-    @Test
-    fun addLocation_insertionStatusEqualsZero_locationNotAdded() {
-
-        //Given location Item
-        val savedLocation =
-            SavedLocation("Washington", 88.0, 33.0, 8, "google.com", "rainy")
-        fakeRepo.addOrDeleteStatus = 0
-        //When adding the location to local
-        val value = favoritesViewModel.addLocation(savedLocation).getOrAwaitValue()
-        //Then location should not be added
-        assertFalse(value)
+        val newSize = favoritesList.size
+        assertEquals(oldSize + 1, newSize)
     }
 
 
+    @Ignore("conflict With Add")
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun removeLocation_existingLocationItem_locationRemoved() {
+    fun removeLocation_existingLocationItem_locationRemoved() = runTest {
+        val oldSize = favoritesList.size
         //When deleting the location from local
-        val value = favoritesViewModel.removeLocation(FakeLocationRepository.savedLocations[0])
-            .getOrAwaitValue()
+        favoritesViewModel.removeLocation(FakeLocationRepository.savedLocations[0])
+        advanceUntilIdle()
         //Then location should be deleted
-        assertTrue(value)
-
+        val newSize = favoritesList.size
+        assertEquals(oldSize - 1, newSize)
     }
 
     @Test

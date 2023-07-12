@@ -1,8 +1,7 @@
 package com.example.marsad.data.repositories
 
 import com.example.marsad.data.model.SavedLocation
-import com.example.marsad.data.network.AlertResponse
-import com.example.marsad.data.network.OneCallResponse
+import com.example.marsad.data.network.WeatherDetailsResponse
 import com.example.marsad.data.network.OpenWeatherMapResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -12,9 +11,6 @@ class FakeLocationRepository : LocationRepositoryInterface {
     private val flow = MutableSharedFlow<OpenWeatherMapResponse>()
      var addOrDeleteStatus = 0
 
-    override suspend fun getWeatherDetails(lat: Double, lon: Double): Flow<OneCallResponse> {
-        TODO("Not yet implemented")
-    }
 
     suspend fun emit(value: OpenWeatherMapResponse) = flow.emit(value)
     override suspend fun getLocationWeather(
@@ -26,12 +22,12 @@ class FakeLocationRepository : LocationRepositoryInterface {
 
     override suspend fun addLocation(savedLocation: SavedLocation): Long {
         savedLocations.add(savedLocation)
-        return addOrDeleteStatus.toLong()
+        return savedLocations.size.toLong()
     }
 
     override suspend fun deleteLocation(savedLocation: SavedLocation): Int {
         savedLocations.remove(savedLocation)
-        return addOrDeleteStatus
+        return savedLocations.size
     }
 
     companion object {

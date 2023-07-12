@@ -3,15 +3,16 @@ package com.example.marsad.data.network
 import retrofit2.Response
 
 class FakeWeatherRemoteDataSource : RemoteSource {
-    lateinit var fakeOneCallResponse: OneCallResponse
+    lateinit var fakeOneCallResponse: WeatherDetailsResponse
     lateinit var fakeOpenWeatherMapResponse: OpenWeatherMapResponse
-    override suspend fun getWeatherStatus(lat: Double, lon: Double): Response<OneCallResponse> {
-        fakeOneCallResponse = OneCallResponse(
+    override suspend fun getWeatherStatus(lat: Double, lon: Double): Response<WeatherDetailsResponse> {
+        fakeOneCallResponse = WeatherDetailsResponse(
             lat = 33.44,
             lon = -94.04,
             timezone = "America/Chicago",
             timezone_offset = -18000,
             current = CurrentWeather(
+                id = 1,
                 dt = 1625881590,
                 sunrise = 1625851175,
                 sunset = 1625903620,

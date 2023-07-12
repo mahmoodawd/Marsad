@@ -1,6 +1,7 @@
 package com.example.marsad.ui.favorites.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,7 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -21,6 +21,7 @@ class FavoritesViewModel(private val repository: LocationRepositoryInterface) : 
     private val _locationWeatherStateFlow: MutableStateFlow<ApiState> =
         MutableStateFlow(ApiState.Loading)
     val locationWeatherStateFlow: StateFlow<ApiState> = _locationWeatherStateFlow
+
 
     fun getSavedLocations(): MutableLiveData<List<SavedLocation>> {
         val locationList = MutableLiveData<List<SavedLocation>>()
@@ -34,28 +35,16 @@ class FavoritesViewModel(private val repository: LocationRepositoryInterface) : 
         return locationList
     }
 
-    fun addLocation(savedLocation: SavedLocation): MutableLiveData<Boolean> {
-        val status = MutableLiveData<Boolean>()
+    fun addLocation(savedLocation: SavedLocation) {
         viewModelScope.launch(Dispatchers.IO) {
-            val st = repository.addLocation(savedLocation)
-            withContext(Dispatchers.Main) {
-
-                status.value = st > 0
-            }
+            repository.addLocation(savedLocation)
         }
-        return status
     }
 
-    fun removeLocation(savedLocation: SavedLocation): MutableLiveData<Boolean> {
-        val status = MutableLiveData<Boolean>()
+    fun removeLocation(savedLocation: SavedLocation) {
         viewModelScope.launch(Dispatchers.IO) {
-            val st = repository.deleteLocation(savedLocation)
-            withContext(Dispatchers.Main){
-
-                status.value = st > 0
-            }
+            repository.deleteLocation(savedLocation)
         }
-        return status
     }
 
     fun getLocationWeather(lat: Double, lon: Double) {
