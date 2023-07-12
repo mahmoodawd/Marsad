@@ -14,19 +14,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.marsad.R
 import com.example.marsad.data.database.localdatasources.LocationLocalDataSource
+import com.example.marsad.data.database.localdatasources.WeatherDetailsLocalDataSource
 import com.example.marsad.data.network.ApiState
 import com.example.marsad.data.network.WeatherRemoteDataSource
 import com.example.marsad.data.network.WeatherDetailsResponse
 import com.example.marsad.data.repositories.LocationRepository
+import com.example.marsad.data.repositories.WeatherDetailsRepository
 import com.example.marsad.databinding.FragmentLocationDetailsBinding
 import com.example.marsad.ui.favorites.viewmodel.SharedViewModel
 import com.example.marsad.ui.home.view.adapters.DayAdapter
 import com.example.marsad.ui.home.view.adapters.HourAdapter
 import com.example.marsad.ui.home.viewmodel.HomeViewModel
-import com.example.marsad.ui.utils.MyViewModelFactory
-import com.example.marsad.ui.utils.UnitsUtils
-import com.example.marsad.ui.utils.getFullDateAndTime
-import com.example.marsad.ui.utils.getHour
+import com.example.marsad.utils.MyViewModelFactory
+import com.example.marsad.utils.UnitsUtils
+import com.example.marsad.utils.getFullDateAndTime
+import com.example.marsad.utils.getHour
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
 
@@ -35,11 +37,18 @@ class LocationDetailsFragment : Fragment() {
     private val sharedViewModel: SharedViewModel by activityViewModels()
     private lateinit var homeContent: View
     lateinit var binding: FragmentLocationDetailsBinding
-    lateinit var homeViewModel: HomeViewModel
     lateinit var hourAdapter: HourAdapter
     lateinit var dayAdapter: DayAdapter
     var lat: Double = 0.0
     var lon: Double = 0.0
+    private val homeViewModel by lazy {
+        val homeViewModelFactory = MyViewModelFactory(
+            WeatherDetailsRepository.getInstance(
+                WeatherRemoteDataSource, WeatherDetailsLocalDataSource(requireContext())
+            )
+        )
+        ViewModelProvider(this, homeViewModelFactory)[HomeViewModel::class.java]
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -54,8 +63,10 @@ class LocationDetailsFragment : Fragment() {
         (requireActivity() as AppCompatActivity).supportActionBar?.hide()
         setLatAndLon()
         setupAdapters()
-        setupViewModel()
         collectWeatherData()
+        if (lat != 0.0 && lon != 0.0) {
+            homeViewModel.getWeatherStatus(lat, lon)
+        }
     }
 
     override fun onStop() {
@@ -89,17 +100,6 @@ class LocationDetailsFragment : Fragment() {
         }
     }
 
-    private fun setupViewModel() {
-        val homeViewModelFactory = MyViewModelFactory(
-            LocationRepository.getInstance(
-                WeatherRemoteDataSource, LocationLocalDataSource(requireContext())
-            )
-        )
-        homeViewModel = ViewModelProvider(this, homeViewModelFactory)[HomeViewModel::class.java]
-        if (lat != 0.0 && lon != 0.0) {
-            homeViewModel.getWeatherStatus(lat, lon)
-        }
-    }
 
     private fun collectWeatherData() {
         lifecycleScope.launch {

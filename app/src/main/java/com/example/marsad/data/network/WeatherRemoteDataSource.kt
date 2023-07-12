@@ -1,6 +1,6 @@
 package com.example.marsad.data.network
 
-import com.example.marsad.ui.utils.UnitsUtils
+import com.example.marsad.utils.UnitsUtils
 
 
 const val API_KEY = "d74e0e363a439e102e4a72c39c09de0b"

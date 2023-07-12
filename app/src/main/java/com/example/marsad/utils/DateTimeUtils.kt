@@ -1,4 +1,4 @@
-package com.example.marsad.ui.utils
+package com.example.marsad.utils
 
 import java.text.SimpleDateFormat
 import java.time.ZoneOffset

@@ -26,8 +26,8 @@ import com.example.marsad.data.repositories.LocationRepository
 import com.example.marsad.databinding.FragmentFavoritesBinding
 import com.example.marsad.ui.favorites.viewmodel.FavoritesViewModel
 import com.example.marsad.ui.favorites.viewmodel.SharedViewModel
-import com.example.marsad.ui.utils.MyViewModelFactory
-import com.example.marsad.ui.utils.UnitsUtils
+import com.example.marsad.utils.MyViewModelFactory
+import com.example.marsad.utils.UnitsUtils
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -92,7 +92,7 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
             (requireActivity() as AppCompatActivity).supportActionBar?.hide()
         }
         binding.mapView.confirmFab.setOnClickListener {
-            addNewLocation()
+            saveLocation()
         }
     }
 
@@ -123,7 +123,7 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
                     }
                     is ApiState.Success<*> -> {
                         val weatherInfo = result.weatherStatus as OpenWeatherMapResponse
-                        saveLocation(weatherInfo)
+//                        saveLocation(weatherInfo)
                         mapView.visibility = View.GONE
                         binding.addToFavFab.visibility = View.VISIBLE
                         binding.savedLocationsRv.visibility = View.VISIBLE
@@ -140,7 +140,7 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun saveLocation(weatherInfo: OpenWeatherMapResponse) {
+    private fun saveLocation() {
         val myLocation = SavedLocation(
             city = UnitsUtils.getCity(
                 requireContext(), locationLat, locationLon
@@ -148,11 +148,15 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
 
             lat = locationLat,
             lon = locationLon,
-            description = weatherInfo.weather[0].description,
-            icon = weatherInfo.weather[0].icon,
-            lastTemp = weatherInfo.main.temp.toInt()
+            /* description = weatherInfo.weather[0].description,
+             icon = weatherInfo.weather[0].icon,
+             lastTemp = weatherInfo.main.temp.toInt()*/
         )
         viewModel.addLocation(myLocation)
+        mapView.visibility = View.GONE
+        binding.addToFavFab.visibility = View.VISIBLE
+        binding.savedLocationsRv.visibility = View.VISIBLE
+        (requireActivity() as AppCompatActivity).supportActionBar?.show()
     }
 
     private fun getLocations() {
@@ -209,6 +213,8 @@ class FavoritesFragment : Fragment(), OnMapReadyCallback {
                 text =
                     UnitsUtils.getCity(requireContext(), locationLat, locationLon)
                 icon = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_check)
+                setBackgroundColor(resources.getColor(R.color.md_theme_light_primary))
+                setTextColor(resources.getColor(R.color.md_theme_dark_onBackground))
             }
 
             viewModel.getLocationWeather(it.latitude, it.longitude)

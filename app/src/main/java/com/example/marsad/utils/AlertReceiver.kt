@@ -1,4 +1,4 @@
-package com.example.marsad.ui.weatheralerts
+package com.example.marsad.utils
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -19,7 +19,6 @@ class AlertReceiver : BroadcastReceiver() {
         val description =
             intent.getStringExtra(context.getString(R.string.alert_description_key)).toString()
         val alertType = intent.getStringExtra(context.getString(R.string.alert_type_key))
-        println("Receiver--------****$alertType")
         when (alertType) {
             AlertType.ALARM -> {
                 launchAlertActivity(context, title, description)
@@ -42,6 +41,4 @@ class AlertReceiver : BroadcastReceiver() {
         context.startActivity(myIntent)
         Log.i("TAG", "onReceive: Alarm Activity Started")
     }
-
-
 }

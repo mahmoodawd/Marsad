@@ -30,10 +30,10 @@ import com.example.marsad.databinding.FragmentHomeBinding
 import com.example.marsad.ui.home.view.adapters.DayAdapter
 import com.example.marsad.ui.home.view.adapters.HourAdapter
 import com.example.marsad.ui.home.viewmodel.HomeViewModel
-import com.example.marsad.ui.utils.MyViewModelFactory
-import com.example.marsad.ui.utils.UnitsUtils
-import com.example.marsad.ui.utils.getFullDateAndTime
-import com.example.marsad.ui.utils.getHour
+import com.example.marsad.utils.MyViewModelFactory
+import com.example.marsad.utils.UnitsUtils
+import com.example.marsad.utils.getFullDateAndTime
+import com.example.marsad.utils.getHour
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -159,7 +159,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     }
 
 
-
     private fun setupAdapters() {
         hourAdapter = HourAdapter(listOf(), requireContext())
         binding.homeContent.hoursRv.apply {
@@ -242,9 +241,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
                 minMaxTv.text = StringBuilder().append(minTemp, "/", maxTemp)
 
-                feelsLikeTv.text =
+                feelsLikeTv.text = StringBuilder().append(
+                    getString(R.string.feels_like), " ",
                     UnitsUtils.getTempRepresentation(requireContext(), it.feels_like)
-
+                )
             }
 
             propertiesCard.apply {
@@ -377,6 +377,10 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 text =
                     UnitsUtils.getCity(requireContext(), lat, lon)
                 icon = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_check)
+
+                setBackgroundColor(resources.getColor(R.color.md_theme_light_primary))
+                setTextColor(resources.getColor(R.color.md_theme_dark_onBackground))
+
             }
 
         }

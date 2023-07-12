@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    android:background="@drawable/card_bg"
-    android:orientation="horizontal">
+    android:background="@drawable/card_bg">
 
 
     <TextView
@@ -19,7 +18,6 @@
         android:text="city"
         android:textColor="@color/md_theme_light_onPrimary"
         android:textStyle="bold"
-        app:drawableEndCompat="@drawable/ic_map_24"
         app:layout_constraintBottom_toTopOf="@+id/data_time_tv"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/temp_tv" />
@@ -32,6 +30,7 @@
         android:layout_gravity="center"
         android:layout_marginStart="17dp"
         android:text="date time"
+        android:visibility="gone"
         android:textColor="@color/md_theme_light_onPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -42,12 +41,13 @@
         android:layout_width="137dp"
         android:layout_height="134dp"
         android:layout_marginEnd="4dp"
-        android:src="@drawable/rain"
+        android:src="@drawable/ic_map_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/temp_tv"
+        android:visibility="gone"
         style="@style/TextAppearance.MaterialComponents.Headline3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -67,6 +67,7 @@
         android:layout_marginEnd="45dp"
         android:padding="8dp"
         android:text="Clear"
+        android:visibility="gone"
         android:textColor="@color/md_theme_light_onPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/weather_icon" />

@@ -27,9 +27,9 @@ import com.example.marsad.data.network.ApiState
 import com.example.marsad.data.network.WeatherRemoteDataSource
 import com.example.marsad.data.repositories.AlertsRepository
 import com.example.marsad.databinding.FragmentWeatherAlertsBinding
-import com.example.marsad.ui.utils.MyViewModelFactory
-import com.example.marsad.ui.utils.getDateAndTime
-import com.example.marsad.ui.weatheralerts.AlertReceiver
+import com.example.marsad.utils.MyViewModelFactory
+import com.example.marsad.utils.getDateAndTime
+import com.example.marsad.utils.AlertReceiver
 import com.example.marsad.ui.weatheralerts.viewmodel.WeatherAlertsViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -139,8 +139,8 @@ class WeatherAlertsFragment : Fragment() {
 
 
     private fun showBottomSheet() {
-        val modalBottomSheet = ModalBottomSheet()
-        modalBottomSheet.show(requireActivity().supportFragmentManager, ModalBottomSheet.TAG)
+        val addNewAlertBottomSheet = AddNewAlertBottomSheet()
+        addNewAlertBottomSheet.show(requireActivity().supportFragmentManager, AddNewAlertBottomSheet.TAG)
 
     }
 

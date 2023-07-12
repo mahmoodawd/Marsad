@@ -1,4 +1,4 @@
-package com.example.marsad.ui.utils
+package com.example.marsad.utils
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

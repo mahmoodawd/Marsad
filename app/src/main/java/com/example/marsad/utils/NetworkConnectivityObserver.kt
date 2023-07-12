@@ -1,4 +1,4 @@
-package com.example.marsad.ui.utils
+package com.example.marsad.utils
 
 import android.annotation.SuppressLint
 import android.content.Context

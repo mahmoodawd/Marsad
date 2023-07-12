@@ -1,4 +1,4 @@
-package com.example.marsad.ui.utils
+package com.example.marsad.utils
 
 import android.content.Context
 import android.location.Address
@@ -56,7 +56,7 @@ object UnitsUtils {
         }
 
         return StringBuilder().append(
-            localizeNumber(convertedSpeed),
+            localizeNumber(convertedSpeed), " ",
             suffix
         ).toString()
     }
@@ -84,7 +84,7 @@ object UnitsUtils {
         ).toString()
     }
 
-    fun getLatLngFromLocation(context: Context, location: String): LatLng{
+    fun getLatLngFromLocation(context: Context, location: String): LatLng {
         val address = getAddressFromLocation(context, location)
 
         return LatLng(address?.latitude ?: 0.0, address?.longitude ?: 0.0)

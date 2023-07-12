@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.marsad.R
 import com.example.marsad.data.network.DailyWeather
 import com.example.marsad.databinding.DayLayoutBinding
-import com.example.marsad.ui.utils.UnitsUtils
+import com.example.marsad.utils.UnitsUtils
 import com.squareup.picasso.Picasso
 import java.text.SimpleDateFormat
 import java.time.Instant

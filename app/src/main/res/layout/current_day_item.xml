@@ -23,8 +23,8 @@
 
             <ImageView
                 android:id="@+id/weather_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
                 android:layout_gravity="center_vertical"
                 android:src="@drawable/rain" />
 
@@ -32,10 +32,12 @@
                 android:id="@+id/weather_condition_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:text="Weather Status Description"
                 android:textAlignment="center"
                 android:textColor="@color/md_theme_light_onPrimary"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout

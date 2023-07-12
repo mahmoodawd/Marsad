@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.recyclerview.widget.RecyclerView
 import com.example.marsad.data.network.HourlyWeather
 import com.example.marsad.databinding.HourItemBinding
-import com.example.marsad.ui.utils.UnitsUtils
+import com.example.marsad.utils.UnitsUtils
 import com.squareup.picasso.Picasso
 import java.text.SimpleDateFormat
 import java.util.*
