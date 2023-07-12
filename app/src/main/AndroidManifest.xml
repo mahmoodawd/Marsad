@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <application
         android:allowBackup="true"
@@ -27,10 +28,11 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
+
         <activity
             android:name=".ui.AlarmActivity"
-            android:theme="@style/Theme.AppStarting"
-            android:exported="false">
+            android:exported="false"
+            android:theme="@style/Theme.AppStarting">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
