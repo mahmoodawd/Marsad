@@ -13,7 +13,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.getDrawable
@@ -24,9 +23,9 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.marsad.R
-import com.example.marsad.data.database.localdatasources.LocationLocalDataSource
+import com.example.marsad.data.database.localdatasources.WeatherDetailsLocalDataSource
 import com.example.marsad.data.network.*
-import com.example.marsad.data.repositories.LocationRepository
+import com.example.marsad.data.repositories.WeatherDetailsRepository
 import com.example.marsad.databinding.FragmentHomeBinding
 import com.example.marsad.ui.home.view.adapters.DayAdapter
 import com.example.marsad.ui.home.view.adapters.HourAdapter
@@ -43,9 +42,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -55,6 +51,7 @@ private const val DEFAULT_LATITUDE = 26.8206
 private const val DEFAULT_LONGITUDE = 30.8025
 
 class HomeFragment : Fragment(), OnMapReadyCallback {
+    private lateinit var weatherResponse: WeatherDetailsResponse
     private var isHaveLocation = false
     private var isFirstUse = true
     var lat: Double = DEFAULT_LATITUDE
@@ -64,14 +61,21 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private lateinit var homeContent: View
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var binding: FragmentHomeBinding
-    lateinit var homeViewModel: HomeViewModel
+    val homeViewModel by lazy {
+        val homeViewModelFactory = MyViewModelFactory(
+            WeatherDetailsRepository.getInstance(
+                WeatherRemoteDataSource, WeatherDetailsLocalDataSource(requireContext())
+            )
+        )
+        ViewModelProvider(this, homeViewModelFactory)[HomeViewModel::class.java]
+    }
     lateinit var hourAdapter: HourAdapter
     lateinit var dayAdapter: DayAdapter
     lateinit var mMap: GoogleMap
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireContext())
         binding = FragmentHomeBinding.inflate(inflater, container, false)
@@ -106,7 +110,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
         readDataFromSharedPrefs()
         setupAdapters()
-        setupViewModel()
+        getWeatherDetails()
         collectWeatherData()
     }
 
@@ -114,6 +118,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     override fun onDestroy() {
         super.onDestroy()
         updateSharedPrefs()
+
     }
 
     private fun updateSharedPrefs() {
@@ -153,6 +158,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             sharedPreferences.getBoolean(getString(R.string.is_having_location_key), false)
     }
 
+
+
     private fun setupAdapters() {
         hourAdapter = HourAdapter(listOf(), requireContext())
         binding.homeContent.hoursRv.apply {
@@ -171,14 +178,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun setupViewModel() {
-        val homeViewModelFactory = MyViewModelFactory(
-            LocationRepository.getInstance(
-                WeatherRemoteDataSource, LocationLocalDataSource(requireContext())
-            )
-        )
-        homeViewModel = ViewModelProvider(this, homeViewModelFactory)[HomeViewModel::class.java]
+    private fun getWeatherDetails() {
         if (lat != 0.0 && lon != 0.0) {
+            homeViewModel.getWeatherStatus(lat, lon, false)
             homeViewModel.getWeatherStatus(lat, lon)
         }
     }
@@ -193,7 +195,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                     is ApiState.Success<*> -> {
                         binding.loadingBar.visibility = View.GONE
                         homeContent.visibility = View.VISIBLE
-                        buildViews(result.weatherStatus as OneCallResponse)
+                        weatherResponse = result.weatherStatus as WeatherDetailsResponse
+                        buildViews(weatherResponse)
                     }
                     else -> {
                         binding.loadingBar.visibility = View.GONE
@@ -205,14 +208,16 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun buildViews(weatherStatus: OneCallResponse) {
+    private fun buildViews(weatherStatus: WeatherDetailsResponse) {
         val currentDayWeather = weatherStatus.current
         val currentDayView = binding.homeContent.currentDayCardView
         val propertiesCard = binding.homeContent.propertiesCard
 
+        hourAdapter.hours = weatherStatus.hourly.take(24)
+        dayAdapter.days = weatherStatus.daily.take(7)
 
-        currentDayView.apply {
-            currentDayWeather?.let {
+        currentDayWeather?.let {
+            currentDayView.apply {
 
                 cityTv.text =
                     UnitsUtils.getCity(requireContext(), weatherStatus.lat, weatherStatus.lon)
@@ -240,52 +245,48 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 feelsLikeTv.text =
                     UnitsUtils.getTempRepresentation(requireContext(), it.feels_like)
 
-                hourAdapter.hours = weatherStatus.hourly.take(24)
-                dayAdapter.days = weatherStatus.daily.take(7)
+            }
 
+            propertiesCard.apply {
 
+                humidity.probName.text = getString(R.string.humidity)
+                humidity.probIcon.setImageResource(R.drawable.ic_water_drop_24)
+                humidity.probValue.text = StringBuilder().append(
+                    UnitsUtils.localizeNumber(it.humidity),
+                    " ",
+                    getString(R.string.percentageSymbol)
+                )
 
+                pressure.probName.text = getString(R.string.pressure)
+                pressure.probIcon.setImageResource(R.drawable.ic_compress_24)
+                pressure.probValue.text = StringBuilder().append(
+                    UnitsUtils.localizeNumber(it.pressure),
+                    " ",
+                    getString(R.string.weather_unit)
+                )
 
-                propertiesCard.apply {
+                clouds.probName.text = getString(R.string.clouds)
+                clouds.probIcon.setImageResource(R.drawable.ic_cloud_24)
+                clouds.probValue.text = StringBuilder().append(
+                    UnitsUtils.localizeNumber(it.clouds),
+                    " ",
+                    getString(R.string.percentageSymbol)
+                )
 
-                    humidity.probName.text = getString(R.string.humidity)
-                    humidity.probIcon.setImageResource(R.drawable.ic_water_drop_24)
-                    humidity.probValue.text = StringBuilder().append(
-                        UnitsUtils.localizeNumber(it.humidity), getString(R.string.percentageSymbol)
-                    )
+                windSpeed.probName.text = getString(R.string.wind_speed)
+                windSpeed.probIcon.setImageResource(R.drawable.ic_air_24)
+                windSpeed.probValue.text =
+                    UnitsUtils.getSpeedRepresentation(requireContext(), it.wind_speed)
 
-                    pressure.probName.text = getString(R.string.pressure)
-                    pressure.probIcon.setImageResource(R.drawable.ic_compress_24)
-                    pressure.probValue.text = StringBuilder().append(
-                        UnitsUtils.localizeNumber(it.pressure),
-                        " ",
-                        getString(R.string.weather_unit)
-                    )
+                sunrise.probName.text = getString(R.string.sunrise)
+                sunrise.probIcon.setImageResource(R.drawable.ic_sunrise_24)
+                sunrise.probValue.text = getHour(it.sunrise)
 
-                    clouds.probName.text = getString(R.string.clouds)
-                    clouds.probIcon.setImageResource(R.drawable.ic_cloud_24)
-                    clouds.probValue.text = StringBuilder().append(
-                        UnitsUtils.localizeNumber(it.clouds), getString(R.string.percentageSymbol)
-                    )
-
-                    windSpeed.probName.text = getString(R.string.wind_speed)
-                    windSpeed.probIcon.setImageResource(R.drawable.ic_air_24)
-                    windSpeed.probValue.text =
-                        UnitsUtils.getSpeedRepresentation(requireContext(), it.wind_speed)
-
-                    sunrise.probName.text = getString(R.string.sunrise)
-                    sunrise.probIcon.setImageResource(R.drawable.ic_sunrise_24)
-                    sunrise.probValue.text = getHour(it.sunrise)
-
-                    sunset.probName.text = getString(R.string.sunset)
-                    sunset.probIcon.setImageResource(R.drawable.ic_sunset_24)
-                    sunset.probValue.text = getHour(it.sunset)
-                }
-
-
+                sunset.probName.text = getString(R.string.sunset)
+                sunset.probIcon.setImageResource(R.drawable.ic_sunset_24)
+                sunset.probValue.text = getHour(it.sunset)
             }
         }
-
     }
 
     override fun onResume() {

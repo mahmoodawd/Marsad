@@ -14,7 +14,7 @@ interface ApiService {
         @Query("units") units: String,
         @Query("exclude") exclude: String,
         @Query("lang") lang: String
-    ): Response<OneCallResponse>
+    ): Response<WeatherDetailsResponse>
 
     @GET("onecall")
     suspend fun getWeatherAlerts(

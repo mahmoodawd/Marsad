@@ -16,7 +16,7 @@ import com.example.marsad.R
 import com.example.marsad.data.database.localdatasources.LocationLocalDataSource
 import com.example.marsad.data.network.ApiState
 import com.example.marsad.data.network.WeatherRemoteDataSource
-import com.example.marsad.data.network.OneCallResponse
+import com.example.marsad.data.network.WeatherDetailsResponse
 import com.example.marsad.data.repositories.LocationRepository
 import com.example.marsad.databinding.FragmentLocationDetailsBinding
 import com.example.marsad.ui.favorites.viewmodel.SharedViewModel
@@ -112,7 +112,7 @@ class LocationDetailsFragment : Fragment() {
                     is ApiState.Success<*> -> {
                         binding.loadingBar.visibility = View.GONE
                         homeContent.visibility = View.VISIBLE
-                        buildViews(result.weatherStatus as OneCallResponse)
+                        buildViews(result.weatherStatus as WeatherDetailsResponse)
                     }
                     else -> {
                         binding.loadingBar.visibility = View.GONE
@@ -124,7 +124,7 @@ class LocationDetailsFragment : Fragment() {
         }
     }
 
-    private fun buildViews(weatherStatus: OneCallResponse) {
+    private fun buildViews(weatherStatus: WeatherDetailsResponse) {
         val currentDayWeather = weatherStatus.current
         val currentDayView = binding.homeContent.currentDayCardView
         val propertiesCard = binding.homeContent.propertiesCard
