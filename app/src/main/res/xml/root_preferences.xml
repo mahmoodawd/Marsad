@@ -1,10 +1,13 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
     <PreferenceCategory app:title="@string/general">
         <ListPreference
             app:entries="@array/location_method_entries"
             app:entryValues="@array/location_method_values"
+            app:icon="@drawable/ic_map_24"
+            app:iconSpaceReserved="true"
             app:key="locationMethod"
             app:title="@string/location_method"
             app:useSimpleSummaryProvider="true" />
@@ -12,6 +15,8 @@
 
     <PreferenceCategory app:title="@string/notification_header">
         <SwitchPreferenceCompat
+            android:defaultValue="true"
+            app:icon="@drawable/ic_alert_24"
             app:key="notifications"
             app:title="@string/notification_title" />
 
@@ -21,13 +26,15 @@
             app:defaultValue="celsius"
             app:entries="@array/temp_entries"
             app:entryValues="@array/temp_values"
+            app:icon="@drawable/ic_device_thermostat"
             app:key="@string/temperature"
             app:title="@string/temperature"
             app:useSimpleSummaryProvider="true" />
         <ListPreference
-            app:defaultValue="meter/second"
+            app:defaultValue="meter_second"
             app:entries="@array/wind_speed_entries"
             app:entryValues="@array/wind_speed_values"
+            app:icon="@drawable/ic_air_24"
             app:key="@string/wind_speed"
             app:title="@string/wind_speed"
             app:useSimpleSummaryProvider="true" />
@@ -36,9 +43,10 @@
 
     <ListPreference
         app:allowDividerAbove="true"
-        app:defaultValue="english"
+        app:defaultValue="system"
         app:entries="@array/language_entries"
         app:entryValues="@array/language_values"
+        app:icon="@drawable/ic_language"
         app:key="@string/language_key"
         app:title="@string/language"
         app:useSimpleSummaryProvider="true" />

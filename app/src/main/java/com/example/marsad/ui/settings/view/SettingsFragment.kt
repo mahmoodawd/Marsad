@@ -6,6 +6,8 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
+import androidx.preference.ListPreference
+import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.example.marsad.R
@@ -18,11 +20,17 @@ class SettingsFragment : PreferenceFragmentCompat(),
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
         PreferenceManager.setDefaultValues(requireContext(), R.xml.root_preferences, true)
+        val languagePreference =
+            findPreference<ListPreference>(getString(R.string.language_key)) as ListPreference
+        languagePreference.setDefaultValue(Locale.getDefault().language)
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         if (key == getString(R.string.language_key)) {
-            val currentLocale = sharedPreferences?.getString(key, "english")
+            val currentLocale = sharedPreferences?.getString(
+                key,
+                Locale.getDefault().language
+            )
             setLocale(currentLocale)
         } else if (key == getString(R.string.pref_location_method_key)) {
             val method = sharedPreferences?.getString(key, null)
@@ -63,8 +71,10 @@ class SettingsFragment : PreferenceFragmentCompat(),
     private fun setLocale(currentLocale: String?) {
         val langTag = when (currentLocale) {
             "arabic" -> "ar-eg"
-            else -> "en-us"
+            "english" -> "en-us"
+            else -> Locale.getDefault().toLanguageTag()
         }
+
         val locale = LocaleListCompat.forLanguageTags(langTag)
         AppCompatDelegate.setApplicationLocales(locale)
     }
