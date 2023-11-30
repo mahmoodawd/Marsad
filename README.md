@@ -1,9 +1,5 @@
 # Marsad
 Marsad is a feature-rich weather app that provides accurate and up-to-date weather information for several locations
-Marsad provides:
-Detailed weather information for your current location, including temperature, wind speed, humidity, and more.
-Scheduling weather alerts to get notified when there's a weather condition of interest for certain location.
-Get weather information about your location using GPS or Google Maps.
 
 
 ## Table of Contents
