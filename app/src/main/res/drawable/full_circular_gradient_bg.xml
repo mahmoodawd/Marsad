@@ -5,6 +5,5 @@
         android:angle="270"
         android:endColor="#1b2746"
         android:startColor="@color/md_theme_light_primary" />
-    <corners
-        android:radius="32dp" />
+    <corners android:radius="32dp" />
 </shape>

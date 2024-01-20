@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    tools:background="@color/md_theme_light_primary">
 
 
     <TextView
@@ -12,25 +13,24 @@
         style="@style/TextAppearance.MaterialComponents.Subtitle1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Saturday"
         android:textAlignment="textStart"
         android:textColor="@color/md_theme_light_onPrimary"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline_v_start"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Weekday" />
 
 
     <ImageView
         android:id="@+id/weather_icon"
         android:layout_width="65dp"
         android:layout_height="50dp"
+        android:contentDescription="@string/app_name"
         android:src="@drawable/rain"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/guideline6"
+        app:layout_constraintBaseline_toBaselineOf="@id/day_tv"
         app:layout_constraintHorizontal_bias="0.017"
-        app:layout_constraintStart_toStartOf="@+id/guideline5"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/icon_guideline_start"
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
@@ -39,16 +39,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
+        android:textAlignment="center"
+        android:maxEms="4"
         android:textColor="@color/md_theme_light_onPrimary"
-        app:layout_constraintBaseline_toBaselineOf="@+id/temp_tv"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/temp_tv"
         app:layout_constraintHorizontal_bias="0.144"
         app:layout_constraintStart_toEndOf="@+id/weather_icon"
-        app:layout_constraintStart_toStartOf="@+id/guideline6"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.571" />
+        app:layout_constraintVertical_bias="0.571"
+        tools:text="Description Description" />
 
     <TextView
         android:id="@+id/temp_tv"
@@ -56,13 +55,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="27"
         android:textColor="@color/md_theme_light_onPrimary"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/temp_guideline_start"
+        app:layout_constraintBaseline_toBaselineOf="@id/day_tv"
         app:layout_constraintEnd_toStartOf="@+id/guideline_v_end"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.428" />
+        app:layout_constraintVertical_bias="0.428"
+        tools:text="19/21°C" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_v_start"
@@ -79,18 +78,18 @@
         app:layout_constraintGuide_percent="0.99" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline5"
+        android:id="@+id/icon_guideline_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.29" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline6"
+        android:id="@+id/temp_guideline_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.45" />
+        app:layout_constraintGuide_percent="0.75" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

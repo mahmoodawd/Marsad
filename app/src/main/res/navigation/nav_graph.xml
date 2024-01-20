@@ -5,28 +5,57 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/homeFragment">
 
-    <fragment
-        android:id="@+id/favoritesFragment"
-        android:name="com.example.marsad.ui.favorites.view.FavoritesFragment"
-        android:label="@string/favorites"
-        tools:layout="@layout/fragment_favorites" />
+    <action
+        android:id="@+id/actions_home_to_details"
+        app:destination="@id/locationDetailsFragment"
+        app:launchSingleTop="true"
+        app:popUpTo="@id/nav_graph"
+        app:popUpToInclusive="true" />
+
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.marsad.ui.home.view.HomeFragment"
         android:label="@string/home"
         tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/favoritesFragment"
+        android:name="com.example.marsad.ui.favorites.view.FavoritesFragment"
+        android:label="@string/favorites"
+        tools:layout="@layout/fragment_favorites">
+        <action
+            android:id="@+id/action_favorites_to_details"
+            app:destination="@id/locationDetailsFragment"
+            app:launchSingleTop="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/locationDetailsFragment"
+        android:name="com.example.marsad.ui.weatherdetails.view.WeatherDetailsFragment"
+        android:label="@string/app_name"
+        tools:layout="@layout/fragment_weather_details">
+        <argument
+            android:name="lat"
+            app:argType="float" />
+        <argument
+            android:name="lon"
+            app:argType="float" />
+    </fragment>
+
     <fragment
         android:id="@+id/weatherAlertsFragment"
         android:name="com.example.marsad.ui.weatheralerts.view.WeatherAlertsFragment"
         android:label="@string/weather_alerts"
         tools:layout="@layout/fragment_weather_alerts" />
+
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.marsad.ui.settings.view.SettingsFragment"
-        android:label="@string/settings" />
-    <fragment
-        android:id="@+id/locationDetailsFragment"
-        android:name="com.example.marsad.ui.favorites.view.LocationDetailsFragment"
-        android:label="fragment_location_details"
-        tools:layout="@layout/fragment_location_details" />
+        android:label="@string/settings">
+        <action
+            android:id="@+id/actions_settings_to_home"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
 </navigation>

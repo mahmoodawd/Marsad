@@ -6,24 +6,29 @@
     android:layout_height="match_parent"
     tools:context=".ui.favorites.view.FavoritesFragment">
 
+    <androidx.recyclerview.widget.RecyclerView
+
+        android:id="@+id/saved_locations_rv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:itemCount="5"
+        tools:listitem="@layout/location_item" />
+
     <include
         android:id="@+id/no_locations_view"
         layout="@layout/no_locations_layout"
         android:visibility="gone" />
 
+
     <include
         android:id="@+id/map_view"
         layout="@layout/map_view"
         android:visibility="gone" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/saved_locations_rv"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/location_item" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_to_fav_fab"
@@ -31,9 +36,9 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="28dp"
         android:layout_marginBottom="26dp"
-        app:borderWidth="12dp"
         android:contentDescription="@string/add_to_favorites"
         android:src="@drawable/ic_add_circle_24"
+        app:borderWidth="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

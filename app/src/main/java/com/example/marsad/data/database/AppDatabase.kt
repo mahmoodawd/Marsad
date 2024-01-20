@@ -8,22 +8,23 @@ import androidx.room.TypeConverters
 import com.example.marsad.data.database.dao.AlertsDao
 import com.example.marsad.data.database.dao.LocationDoa
 import com.example.marsad.data.database.dao.WeatherDetailsDoa
-import com.example.marsad.data.model.*
-import com.example.marsad.data.network.*
+import com.example.marsad.data.database.entities.AlertEntity
+import com.example.marsad.data.database.entities.LocationEntity
+import com.example.marsad.data.database.entities.WeatherForecastEntity
+import com.example.marsad.data.database.typeconverters.TimeStampConverter
+import com.example.marsad.data.database.typeconverters.WeatherConverter
+
+private const val DATA_BASE_NAME = "favorites-db"
 
 @Database(
-    [SavedLocation::class, AlertItem::class, WeatherDetailsResponse::class, CurrentWeather::class,
-        HourlyWeather::class,
-        DailyWeather::class,
-        Weather::class,
-        Temperature::class,
-        FeelsLikeTemperature::class], version = 1
+    [LocationEntity::class, AlertEntity::class, WeatherForecastEntity::class],
+    version = 1,
+    exportSchema = false
 )
 @TypeConverters(
     value = [
-        HourlyWeatherListConverter::class,
-        DailyWeatherListConverter::class,
-        WeatherListConverter::class
+        TimeStampConverter::class,
+        WeatherConverter::class
     ]
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -38,7 +39,7 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "favorites-db"
+                    DATA_BASE_NAME
                 ).build()
                 INSTANCE = instance
                 return instance

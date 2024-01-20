@@ -1,32 +1,37 @@
 package com.example.marsad.ui.home.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.marsad.data.network.ApiState
-import com.example.marsad.data.repositories.LocationRepositoryInterface
-import com.example.marsad.data.repositories.WeatherDetailsRepositoryInterface
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.launch
+import com.example.marsad.core.utils.GPS
+import com.example.marsad.core.utils.MAP
+import com.example.marsad.domain.repositories.UserPrefsRepositoryInterface
+import kotlinx.coroutines.flow.asStateFlow
 
-class HomeViewModel(private val weatherDetailsRepository: WeatherDetailsRepositoryInterface) : ViewModel() {
-    val TAG = HomeViewModel::class.java.simpleName
+class HomeViewModel(
+    private val userPrefsRepository: UserPrefsRepositoryInterface,
+) : ViewModel() {
+    companion object {
+        private const val TAG = "HomeViewModel"
+    }
 
-    private val _weatherDataStateFlow: MutableStateFlow<ApiState> =
-        MutableStateFlow(ApiState.Loading)
-    val weatherDataStateFlow: StateFlow<ApiState> = _weatherDataStateFlow
+    val userPrefsState = userPrefsRepository.prefs.asStateFlow()
 
-    fun getWeatherStatus(lat: Double, lon: Double, forceUpdate: Boolean = true) {
-        viewModelScope.launch {
-            weatherDetailsRepository.getWeatherDetails(lat, lon, forceUpdate).catch { e ->
-                _weatherDataStateFlow.value = ApiState.Failure(e)
-                Log.i(TAG, "getWeatherStatus: Failed: ${e.message}")
-            }.collect { weatherData ->
-                _weatherDataStateFlow.value = ApiState.Success(weatherData)
-            }
-        }
+
+    fun preferGPSMethod() {
+        userPrefsRepository.updatePreferredLocationMethod(GPS)
+    }
+
+    fun preferMapMethod() {
+        userPrefsRepository.updatePreferredLocationMethod(MAP)
+    }
+
+    fun onLocationChanged(latitude: Double, longitude: Double) {
+        userPrefsRepository.updateLatLon(latitude, longitude)
+    }
+
+    fun updatePrefs() {
+        userPrefsRepository.updatePrefs()
     }
 
 }
+
+

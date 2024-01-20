@@ -9,7 +9,7 @@
             app:entryValues="@array/location_method_values"
             app:icon="@drawable/ic_map_24"
             app:iconSpaceReserved="true"
-            app:key="locationMethod"
+            app:key="LOCATION_METHOD"
             app:title="@string/location_method"
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
@@ -17,6 +17,7 @@
     <PreferenceCategory app:title="@string/notification_header">
         <SwitchPreferenceCompat
             android:defaultValue="true"
+            android:enabled="false"
             app:icon="@drawable/ic_alert_24"
             app:key="notifications"
             app:title="@string/notification_title" />
@@ -24,36 +25,34 @@
     </PreferenceCategory>
     <PreferenceCategory app:title="@string/units">
         <ListPreference
-            app:defaultValue="celsius"
+            android:defaultValue="CELSIUS"
             app:dialogTitle="@string/temperature"
             app:entries="@array/temp_entries"
             app:entryValues="@array/temp_values"
             app:icon="@drawable/ic_device_thermostat"
-            app:key="@string/temperature"
+            app:key="TEMPERATURE_UNIT"
             app:title="@string/temperature"
             app:useSimpleSummaryProvider="true" />
         <ListPreference
-            app:defaultValue="meter_second"
+            android:defaultValue="METER_SEC"
             app:dialogTitle="@string/wind_speed"
             app:entries="@array/wind_speed_entries"
             app:entryValues="@array/wind_speed_values"
             app:icon="@drawable/ic_air_24"
-            app:key="@string/wind_speed"
+            app:key="SPEED_UNIT"
             app:title="@string/wind_speed"
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
 
     <ListPreference
+        android:key="@string/language_key"
         app:allowDividerAbove="true"
-        app:defaultValue="system"
         app:dialogTitle="@string/language"
         app:entries="@array/language_entries"
         app:entryValues="@array/language_values"
         app:icon="@drawable/ic_language"
         app:title="@string/language"
-        android:key="@string/language_key"
         app:useSimpleSummaryProvider="true" />
-
 
 </PreferenceScreen>

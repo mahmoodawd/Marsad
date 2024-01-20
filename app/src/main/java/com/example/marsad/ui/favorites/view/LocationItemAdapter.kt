@@ -4,23 +4,18 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.marsad.R
-import com.example.marsad.data.model.SavedLocation
 import com.example.marsad.databinding.LocationItemBinding
-import com.example.marsad.utils.UnitsUtils
-import com.example.marsad.utils.getLocalTime
-import com.squareup.picasso.Picasso
+import com.example.marsad.domain.models.FavoriteLocation
 
 class LocationItemAdapter(
-    locationsItems: List<SavedLocation>,
-    private val onItemClick: (SavedLocation) -> Unit,
-    val context: Context
+    locationsItems: List<FavoriteLocation>,
+    private val onItemClick: (FavoriteLocation) -> Unit,
 ) :
     RecyclerView.Adapter<LocationItemAdapter.ViewHolder>() {
     var locations = locationsItems
         set(value) {
-            notifyDataSetChanged()
             field = value
+            notifyDataSetChanged()
         }
     lateinit var binding: LocationItemBinding
 
@@ -35,15 +30,13 @@ class LocationItemAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currentLocation = locations[position]
-        val iconUrl = "https://openweathermap.org/img/wn/${currentLocation.icon}@2x.png"
 
         holder.binding.cityTv.text = currentLocation.city
-        holder.binding.tempTv.text =
-            UnitsUtils.getTempRepresentation(context, currentLocation.lastTemp.toDouble(), true)
-        holder.binding.dataTimeTv.text =
-            getLocalTime(currentLocation.lat, currentLocation.lon)
-        holder.binding.weatherConditionTv.text = currentLocation.description
-//        Picasso.get().load(iconUrl).into(holder.binding.weatherIcon)
+//        holder.binding.tempTv.text =
+//            UnitsUtils.getTempRepresentation(context, currentLocation.lastTemp.toDouble(), true)
+//        holder.binding.dataTimeTv.text = getLocalTime()
+//        holder.binding.weatherConditionTv.text = currentLocation.description
+//        holder.binding.weatherIcon.setImageUrl(currentLocation.icon)
 
         holder.binding.locationCard.setOnClickListener {
             onItemClick(currentLocation)

@@ -23,7 +23,8 @@
             app:navigationIcon="@drawable/ic_list_24"
             app:navigationIconTint="@color/md_theme_light_onPrimary"
             app:titleCentered="true"
-            app:titleTextColor="@color/md_theme_light_onPrimary" />
+            app:titleTextColor="@color/md_theme_light_onPrimary"
+            tools:title="Fragment Title" />
 
 
         <androidx.fragment.app.FragmentContainerView

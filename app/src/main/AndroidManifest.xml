@@ -14,6 +14,7 @@
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <application
+        android:name=".MarsadApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -24,21 +25,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppStarting"
         tools:targetApi="tiramisu">
-        <receiver
-            android:name=".utils.ConnectivityReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action
-                    android:name="android.net.conn.CONNECTIVITY_CHANGE"
-                    tools:ignore="BatteryLife" />
-                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
-            </intent-filter>
-        </receiver>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="${MAPS_API_KEY}" />
+            android:value="AIzaSyAvuhZU1zrqgMiwWvpeK6q4ubGz_n0nASc" />
 
         <activity
             android:name=".ui.AlarmActivity"
@@ -63,7 +53,7 @@
         </activity>
 
         <receiver
-            android:name=".utils.AlertReceiver"
+            android:name=".core.notifications.AlertReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

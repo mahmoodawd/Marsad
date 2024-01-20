@@ -1,20 +1,18 @@
 package com.example.marsad.data.network
 
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.google.gson.GsonBuilder
 import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 
 object RetrofitHelper {
     private const val BASE_URL = "https://api.openweathermap.org/data/2.5/"
-    private fun createMoshi(): Moshi = Moshi.Builder()
-        .add(KotlinJsonAdapterFactory())
-        .build()
 
-    val retrofitInstance =
+    val retrofitInstance: ApiService by lazy {
         Retrofit.Builder()
             .addConverterFactory(
-                MoshiConverterFactory.create(createMoshi())
+                GsonConverterFactory.create(GsonBuilder().setLenient().create())
             ).baseUrl(BASE_URL)
-            .build()
+            .build().create()
+    }
 }

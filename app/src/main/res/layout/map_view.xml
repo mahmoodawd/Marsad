@@ -2,19 +2,21 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_marginTop="16dp">
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/searchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="@drawable/circular_white_bg"
+        android:layout_margin="4dp"
+        android:alpha="0.7"
+        android:background="@drawable/squircle_white_bg"
         android:elevation="5dp"
         app:iconifiedByDefault="false"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:queryHint="Search Here" />
+        app:queryHint="Search Cities" />
 
     <fragment
         android:id="@+id/googleMapView"
@@ -23,17 +25,22 @@
         android:layout_height="match_parent" />
 
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/confirm_fab"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="@string/pick_a_location"
-        app:icon="@drawable/ic_map_24"
-        app:iconSize="36dp"
+        android:layout_marginBottom="48dp"
+        android:visibility="gone"
+        android:backgroundTint="@color/md_theme_light_primary"
+        android:contentDescription="@string/confirm_location"
+        android:elevation="8dp"
+        android:src="@drawable/ic_check"
+        app:borderWidth="6dp"
+        app:iconSize="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toStartOf="@+id/googleMapView"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/googleMapView"
+        app:tint="@color/md_theme_light_onPrimary" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

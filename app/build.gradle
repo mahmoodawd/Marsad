@@ -3,18 +3,19 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+    id 'androidx.navigation.safeargs.kotlin'
 }
 
 android {
     namespace 'com.example.marsad'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.marsad"
         minSdk 26
         targetSdk 33
         versionCode 1
-        versionName "1.0"
+        versionName "1.1"
 
         resourceConfigurations += ["en", "ar"]
 
@@ -45,6 +46,9 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
+    //Work Manager
+    implementation 'androidx.work:work-runtime-ktx:2.9.0'
     //Coroutines
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1'
@@ -56,12 +60,12 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-moshi:2.9.0'
     implementation 'com.squareup.moshi:moshi-kotlin:1.14.0'
     //Room
-    implementation "androidx.room:room-ktx:2.5.2"
-    implementation "androidx.room:room-runtime:2.5.2"
+    implementation "androidx.room:room-ktx:2.6.1"
+    implementation "androidx.room:room-runtime:2.6.1"
     implementation 'androidx.preference:preference:1.2.0'
     //DataBinding
     implementation 'androidx.databinding:databinding-common:8.0.2'
-    kapt "androidx.room:room-compiler:2.5.2"
+    kapt "androidx.room:room-compiler:2.6.1"
     //ViewModel
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'

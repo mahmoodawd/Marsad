@@ -1,72 +1,56 @@
 package com.example.marsad.ui.favorites.viewmodel
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.marsad.data.model.SavedLocation
-import com.example.marsad.data.network.ApiState
-import com.example.marsad.data.repositories.LocationRepositoryInterface
+import com.example.marsad.data.network.Resource
+import com.example.marsad.data.network.asResource
+import com.example.marsad.domain.models.FavoriteLocation
+import com.example.marsad.domain.repositories.LocationRepositoryInterface
+import com.example.marsad.ui.favorites.view.FavUiState
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-class FavoritesViewModel(private val repository: LocationRepositoryInterface) : ViewModel() {
-    private val TAG = FavoritesViewModel::class.java.simpleName
+class FavoritesViewModel(
+    private val repository: LocationRepositoryInterface,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+) : ViewModel() {
 
-    private val _locationWeatherStateFlow: MutableStateFlow<ApiState> =
-        MutableStateFlow(ApiState.Loading)
-    val locationWeatherStateFlow: StateFlow<ApiState> = _locationWeatherStateFlow
-    private val _weatherDataStateFlow: MutableStateFlow<ApiState> =
-        MutableStateFlow(ApiState.Loading)
-    val weatherDataStateFlow: StateFlow<ApiState> = _weatherDataStateFlow
+    val favLocationsUiState: StateFlow<FavUiState> = repository.getSavedLocations()
+        .asResource()
+        .map { state ->
+            when (state) {
+                is Resource.Failure -> FavUiState.Error
 
-    fun getSavedLocations(): MutableLiveData<List<SavedLocation>> {
-        val locationList = MutableLiveData<List<SavedLocation>>()
-        viewModelScope.launch {
-            repository.getSavedLocations().catch { e ->
-                Log.i(TAG, "getSavedLocations: ${e.message}")
-            }.collect {
-                locationList.postValue(it)
+                Resource.Loading -> FavUiState.Loading
+
+                is Resource.Success -> {
+                    val locations = (state.data)
+                    if (locations.isEmpty()) FavUiState.Empty
+                    else FavUiState.Success(locations.reversed())
+                }
             }
-        }
-        return locationList
-    }
+        }.stateIn(
+            scope = viewModelScope,
+            initialValue = FavUiState.Loading,
+            started = SharingStarted.WhileSubscribed(5_000)
+        )
 
-    fun addLocation(savedLocation: SavedLocation) {
-        viewModelScope.launch(Dispatchers.IO) {
+
+    fun addLocation(savedLocation: FavoriteLocation) =
+        viewModelScope.launch(dispatcher) {
             repository.addLocation(savedLocation)
         }
-    }
 
-    fun removeLocation(savedLocation: SavedLocation) {
-        viewModelScope.launch(Dispatchers.IO) {
+
+    fun removeLocation(savedLocation: FavoriteLocation) =
+        viewModelScope.launch(dispatcher) {
             repository.deleteLocation(savedLocation)
         }
-    }
 
-    fun getLocationWeather(lat: Double, lon: Double) {
-        viewModelScope.launch {
-            repository.getLocationWeather(lat, lon).catch { e ->
-                _locationWeatherStateFlow.value = ApiState.Failure(e)
-            }.collect {
-                _locationWeatherStateFlow.value = ApiState.Success(it)
-            }
-        }
-    }
 
-    fun getWeatherStatus(lat: Double, lon: Double, forceUpdate: Boolean = true) {
-        viewModelScope.launch {
-            repository.getWeatherDetails(lat, lon, forceUpdate).catch { e ->
-                _weatherDataStateFlow.value = ApiState.Failure(e)
-                Log.i(TAG, "getWeatherStatus: Failed: ${e.message}")
-            }.collect { weatherData ->
-                _weatherDataStateFlow.value = ApiState.Success(weatherData)
-            }
-        }
-    }
 }

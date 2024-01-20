@@ -1,8 +1,8 @@
 package com.example.marsad.ui
 
 import android.media.MediaPlayer
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.example.marsad.R
 import com.example.marsad.databinding.ActivityAlarmBinding
 
@@ -12,12 +12,12 @@ class AlarmActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityAlarmBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        buildViews()
         val mediaPlayer = MediaPlayer.create(this, R.raw.alarm_sound)
         mediaPlayer.isLooping = true
         mediaPlayer.start()
-        buildViews()
         binding.closeAlarmFab.setOnClickListener {
-            mediaPlayer.release()
+//            mediaPlayer.release() //Causes [IllegalStateException]
             mediaPlayer.stop()
             finish()
         }
