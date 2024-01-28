@@ -1,15 +1,15 @@
 <resources>
     <!-- Reply Preference -->
     <string-array name="temp_entries">
-        <item>celsius °C</item>
+        <item>Celsius °C</item>
         <item>Kelvin °K</item>
         <item>Fahrenheit  °F</item>
     </string-array>
 
     <string-array name="temp_values">
-        <item>celsius</item>
-        <item>kelvin</item>
-        <item>fahrenheit</item>
+        <item>CELSIUS</item>
+        <item>KELVIN</item>
+        <item>FAHRENHEIT</item>
     </string-array>
 
     <string-array name="wind_speed_entries">
@@ -18,8 +18,8 @@
     </string-array>
 
     <string-array name="wind_speed_values">
-        <item>meter_second</item>
-        <item>miles_hour</item>
+        <item>METER_SEC</item>
+        <item>MILES_HOUR</item>
     </string-array>
 
 
@@ -29,20 +29,17 @@
     </string-array>
 
     <string-array name="location_method_values">
-        <item>map</item>
-        <item>gps</item>
+        <item>MAP</item>
+        <item>GPS</item>
     </string-array>
 
     <string-array name="language_entries">
         <item>English</item>
         <item>Arabic</item>
-        <item>Same As System</item>
     </string-array>
 
     <string-array name="language_values">
-        <item>english</item>
-        <item>arabic</item>
-        <item>system</item>
-
+        <item>en</item>
+        <item>ar</item>
     </string-array>
 </resources>

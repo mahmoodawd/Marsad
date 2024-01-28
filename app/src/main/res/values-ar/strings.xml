@@ -16,7 +16,7 @@
     <string name="permission_msg">للحصول على معلومات الطقس يجب إعطائنا الأذونات اللازمة، اصغط على الذر أدناه لإعطائنا إذن الحصول على الموقع</string>
     <string name="grant">تنفيذ</string>
     <string name="confirm_location">تأكيد</string>
-    <string name="weather_unit">باسكال</string>
+    <string name="pressure_unit">باسكال</string>
     <string name="units">وحدات القياس</string>
     <string name="temperature">درجة الحرارة</string>
     <string name="celsius">مئوية</string>
@@ -58,5 +58,6 @@
     <string name="invalid_date_range">تاريخ البداية يجب أن يسبق تاريخ نهاية التتبيه</string>
     <string name="alert_scheduled">تم جدولة التنبيه إلى</string>
     <string name="enable">تشغيل</string>
-    <string name="no_internet_msg">لا يوجد انترنت</string>
+    <string name="no_internet_msg">⚠️ لا يوجد انترنت</string>
+    <string name="error_getting_data">حدث خطأ ما</string>
 </resources>

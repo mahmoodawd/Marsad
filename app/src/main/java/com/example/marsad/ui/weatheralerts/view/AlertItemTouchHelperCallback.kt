@@ -6,28 +6,26 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.marsad.R
-import com.example.marsad.data.model.AlertItem
-import com.example.marsad.data.model.SavedLocation
+import com.example.marsad.domain.models.Alert
 
 class AlertItemTouchHelperCallback(
-    context: Context,
+    val context: Context,
     private val alertItemAdapter: AlertItemAdapter,
-    private val onSwipedCallback: (item: AlertItem) -> Unit
+    private val onSwipedCallback: (item: Alert) -> Unit,
 ) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
-    private val deleteIcon =
-        ContextCompat.getDrawable(context, R.drawable.ic_delete)
+
 
     override fun onMove(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder,
-        target: RecyclerView.ViewHolder
+        target: RecyclerView.ViewHolder,
     ): Boolean {
         return false
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         val position = viewHolder.adapterPosition
-        val swipedItem: AlertItem = alertItemAdapter.alertItemList[position]
+        val swipedItem: Alert = alertItemAdapter.alertItemList[position]
         onSwipedCallback(swipedItem)
     }
 
@@ -38,8 +36,10 @@ class AlertItemTouchHelperCallback(
         dX: Float,
         dY: Float,
         actionState: Int,
-        isCurrentlyActive: Boolean
+        isCurrentlyActive: Boolean,
     ) {
+        val deleteIcon =
+            ContextCompat.getDrawable(context, R.drawable.ic_delete)
         super.onChildDraw(
             c,
             recyclerView,

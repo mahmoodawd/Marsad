@@ -9,12 +9,12 @@
     <string name="humidity">Humidity</string>
     <string name="clouds">Clouds</string>
     <string name="wind_speed">Wind Speed</string>
-    <string name="meter_sec">Meter/Sec</string>
-    <string name="miles_hour">Miles/Hour</string>
+    <string name="meter_sec">m/Sec</string>
+    <string name="miles_hour">M/Hour</string>
     <string name="sunrise">sunrise</string>
     <string name="sunset">sunset</string>
     <string name="percentageSymbol" translatable="false">%</string>
-    <string name="weather_unit">hPa</string>
+    <string name="pressure_unit">hPa</string>
     <string name="celsius_suffix">°C</string>
     <string name="permission_msg">We are unable to get your weather data due to location permission, please give us the permission by tapping on the following button</string>
     <string name="grant">Grant</string>
@@ -76,6 +76,8 @@
     <string name="invalid_date_range">Start Must be before End</string>
     <string name="alert_scheduled">Alert Scheduled to</string>
     <string name="enable">Enable</string>
-    <string name="no_internet_msg">No Internet</string>
-    <string name="internet_action">InternetAction</string>
+    <string name="no_internet_msg">⚠️ No Internet</string>
+    <string name="internet_action" translatable="false">InternetAction</string>
+    <string name="empty" translatable="false" />
+    <string name="error_getting_data">An Error Occurred</string>
 </resources>

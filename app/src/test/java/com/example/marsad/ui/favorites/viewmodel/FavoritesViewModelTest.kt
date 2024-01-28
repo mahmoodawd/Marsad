@@ -1,115 +1,146 @@
 package com.example.marsad.ui.favorites.viewmodel
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import app.cash.turbine.test
-import com.example.marsad.data.model.SavedLocation
-import com.example.marsad.data.network.ApiState
-import com.example.marsad.data.network.Coord
-import com.example.marsad.data.network.Main
-import com.example.marsad.data.network.OpenWeatherMapResponse
-import com.example.marsad.data.repositories.FakeAlertsRepository
 import com.example.marsad.data.repositories.FakeLocationRepository
-import com.example.marsad.getOrAwaitValue
+import com.example.marsad.domain.models.FavoriteLocation
+import com.example.marsad.ui.favorites.view.FavUiState
+import com.example.marsad.util.MainDispatcherRule
 import kotlinx.coroutines.*
-import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.*
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 
-@Config(manifest = Config.NONE)
 @RunWith(AndroidJUnit4::class)
 class FavoritesViewModelTest {
+
     private lateinit var favoritesViewModel: FavoritesViewModel
-    private lateinit var fakeRepo: FakeLocationRepository
-    private lateinit var favoritesList: MutableList<SavedLocation>
+    private val locationsRepo = FakeLocationRepository()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val testScope = UnconfinedTestDispatcher()
 
 
     @get:Rule
-    var instantExecutorRule = InstantTaskExecutorRule()
-
+    val mainDispatcherRule = MainDispatcherRule()
 
     @Before
     fun setUp() {
-        fakeRepo = FakeLocationRepository()
-        favoritesViewModel = FavoritesViewModel(fakeRepo)
-        favoritesList = FakeLocationRepository.savedLocations
+        favoritesViewModel = FavoritesViewModel(repository = locationsRepo, dispatcher = testScope)
+
     }
 
     @Test
-    fun getSavedLocations_savedLocationsNotNull() {
-        //When retrieving location from local
-        val value = favoritesViewModel.getSavedLocations().getOrAwaitValue()
-        //Then location should not be null
-        assertThat(value, not(nullValue()))
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun addLocation_newLocationItem_locationItemsIncreasedByOne() = runTest {
-        //Given location Item
-        val oldSize = favoritesList.size
-        val savedLocation =
-            SavedLocation("Washington", 88.0, 33.0, 8, "google.com", "rainy")
-        //When adding the location to local
-        favoritesViewModel.addLocation(savedLocation)
-        advanceUntilIdle()
-        //Then location should be added
-        val newSize = favoritesList.size
-        assertEquals(oldSize + 1, newSize)
-    }
-
-
-    @Ignore("conflict With Add")
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun removeLocation_existingLocationItem_locationRemoved() = runTest {
-        val oldSize = favoritesList.size
-        //When deleting the location from local
-        favoritesViewModel.removeLocation(FakeLocationRepository.savedLocations[0])
-        advanceUntilIdle()
-        //Then location should be deleted
-        val newSize = favoritesList.size
-        assertEquals(oldSize - 1, newSize)
+    fun favoriteViewModel_getInitialState_stateIsInitiallyLoading() = runTest {
+        assertEquals(FavUiState.Loading, favoritesViewModel.favLocationsUiState.value)
     }
 
     @Test
-    fun getLocationWeather_emitNothing_ApiStateLoading() {
-        runTest {
-            //When calling getLocationWeather
-            favoritesViewModel.getLocationWeather(
-                lat = 0.0,
-                lon = 1.0
-            )
-            //Then should be the initial state: Loading
-            assertEquals(
-                ApiState.Loading,
-                favoritesViewModel.locationWeatherStateFlow.value
-            )
+    fun favoriteViewModel_loadingLocations_stateIsLoading() = runTest {
 
+        locationsRepo.sendFavoritesLocations(sampleLocations)
 
-        }
+        assertEquals(FavUiState.Loading, favoritesViewModel.favLocationsUiState.value)
+
     }
 
     @Test
-    fun getLocationWeather_emittingSomeValue_ApiStateSuccess() = runTest {
-        //When calling getLocationWeather and emitting some value
-        favoritesViewModel.getLocationWeather(
-            lat = 0.0,
-            lon = 1.0
+    fun favoriteViewModel_afterLoadingLocations_locationsAreShownReversed() = runTest {
+        // Create empty collector to make the locations stateflow start emitting because of the stateIn operator
+        val collectJob = launch(testScope) { favoritesViewModel.favLocationsUiState.collect() }
+
+        locationsRepo.sendFavoritesLocations(sampleLocations)
+
+        assertEquals(
+            FavUiState.Success(sampleLocations.reversed()),
+            favoritesViewModel.favLocationsUiState.value
         )
-        //Then should be the Success state
-        val response = OpenWeatherMapResponse(Coord(20.0, 30.0), Main(25.0), listOf())
-        fakeRepo.emit(response)
 
-        favoritesViewModel.locationWeatherStateFlow.test {
-            assertEquals(ApiState.Success(response), awaitItem())
-        }
+        collectJob.cancel()
+    }
+
+    @Test
+    fun favoriteViewModel_loadingEmptyLocations_stateIsEmpty() = runTest {
+        // Create empty collector to make the locations stateflow start emitting because of the stateIn operator
+        val collectJob = launch(testScope) { favoritesViewModel.favLocationsUiState.collect() }
+
+        locationsRepo.sendFavoritesLocations(emptyList())
+
+        assertEquals(
+            FavUiState.Empty,
+            favoritesViewModel.favLocationsUiState.value
+        )
+
+        collectJob.cancel()
+    }
+
+    @Test
+    fun favoriteViewModel_addingNewLocation_locationsAreUpdated() = runTest {
+        val collectJob = launch(testScope) { favoritesViewModel.favLocationsUiState.collect() }
+
+        locationsRepo.sendFavoritesLocations(sampleLocations)
+        favoritesViewModel.addLocation(
+            FavoriteLocation(51.5099, -0.1180, "London", "United Kingdom"),
+        )
+        assertEquals(
+            FavUiState.Success(
+                (sampleLocations +
+                        FavoriteLocation(
+                            51.5099,
+                            -0.1180,
+                            "London",
+                            "United Kingdom"
+                        )).reversed()
+
+            ),
+            favoritesViewModel.favLocationsUiState.value
+        )
+
+        collectJob.cancel()
+    }
+
+    @Test
+    fun favoriteViewModel_removingLocation_locationsAreUpdated() = runTest {
+        val collectJob = launch(testScope) { favoritesViewModel.favLocationsUiState.collect() }
+
+        locationsRepo.sendFavoritesLocations(sampleLocations)
+        favoritesViewModel.removeLocation(
+            FavoriteLocation(51.5099, -0.1180, "London", "United Kingdom"),
+        )
+        assertEquals(
+            FavUiState.Success(
+                (sampleLocations.filterNot {
+                    it == FavoriteLocation(
+                        51.5099,
+                        -0.1180,
+                        "London",
+                        "United Kingdom"
+                    )
+                }).reversed()
+
+            ),
+            favoritesViewModel.favLocationsUiState.value
+        )
+
+        collectJob.cancel()
     }
 }
+
+
+private val sampleLocations = listOf(
+    FavoriteLocation(37.7749, -122.4194, "San Francisco", "United States"),
+    FavoriteLocation(40.7128, -74.0060, "New York City", "United States"),
+    FavoriteLocation(51.5099, -0.1180, "London", "United Kingdom"),
+    FavoriteLocation(48.8566, 2.3522, "Paris", "France"),
+    FavoriteLocation(35.6895, 139.6917, "Tokyo", "Japan"),
+    FavoriteLocation(-33.8688, 151.2093, "Sydney", "Australia"),
+    FavoriteLocation(-23.5505, -46.6333, "São Paulo", "Brazil"),
+    FavoriteLocation(55.7558, 37.6176, "Moscow", "Russia"),
+    FavoriteLocation(40.4168, -3.7038, "Madrid", "Spain"),
+    FavoriteLocation(-34.6037, -58.3816, "Buenos Aires", "Argentina")
+)

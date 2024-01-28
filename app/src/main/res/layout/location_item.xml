@@ -1,11 +1,12 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/location_card"
-    android:layoutDirection="ltr"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    android:background="@drawable/full_circular_gradient_bg">
+    android:background="@drawable/full_circular_gradient_bg"
+    android:layoutDirection="ltr">
 
 
     <TextView
@@ -15,11 +16,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginStart="16dp"
-        android:text="city"
+        android:padding="12dp"
         android:textColor="@color/md_theme_light_onPrimary"
         app:layout_constraintBottom_toTopOf="@+id/data_time_tv"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/temp_tv" />
+        app:layout_constraintTop_toBottomOf="@+id/temp_tv"
+        tools:text="city" />
 
     <TextView
         android:id="@+id/data_time_tv"
@@ -28,36 +30,38 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginStart="17dp"
-        android:text="date time"
-        android:visibility="gone"
         android:textColor="@color/md_theme_light_onPrimary"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/city_tv" />
+        app:layout_constraintTop_toBottomOf="@+id/city_tv"
+        tools:text="date time" />
 
     <ImageView
         android:id="@+id/weather_icon"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginEnd="4dp"
+        android:contentDescription="@string/app_name"
         android:src="@drawable/ic_map_24"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/temp_tv"
-        android:visibility="gone"
         style="@style/TextAppearance.MaterialComponents.Headline3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginStart="16dp"
-        android:text="27"
         android:textColor="@color/md_theme_light_onPrimary"
         android:textStyle="bold"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/city_tv"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="27" />
 
     <TextView
         android:id="@+id/weather_condition_tv"
@@ -65,11 +69,11 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="45dp"
         android:padding="8dp"
-        android:text="Clear"
-        android:visibility="gone"
         android:textColor="@color/md_theme_light_onPrimary"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/weather_icon" />
+        app:layout_constraintTop_toBottomOf="@+id/weather_icon"
+        tools:text="Weather Condition" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

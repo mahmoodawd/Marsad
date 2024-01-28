@@ -1,91 +1,94 @@
 package com.example.marsad.ui.weatheralerts.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.marsad.data.model.AlertItem
-import com.example.marsad.data.network.AlertResponse
-import com.example.marsad.data.network.ApiState
-import com.example.marsad.data.repositories.AlertsRepositoryInterface
+import com.example.marsad.data.network.Resource
+import com.example.marsad.data.network.asResource
+import com.example.marsad.domain.models.Alert
+import com.example.marsad.domain.models.NotificationAlert
+import com.example.marsad.domain.repositories.AlertsRepositoryInterface
+import com.example.marsad.ui.weatheralerts.view.AlertsUiState
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.security.DigestInputStream
 
-class WeatherAlertsViewModel(private val repository: AlertsRepositoryInterface) : ViewModel() {
-    private val TAG = WeatherAlertsViewModel::class.java.simpleName
-    private val _weatherAlertsStateFlow: MutableStateFlow<ApiState> =
-        MutableStateFlow(ApiState.Loading)
-    val weatherAlertsStateFlow: StateFlow<ApiState> = _weatherAlertsStateFlow.asStateFlow()
+class WeatherAlertsViewModel(
+    private val repository: AlertsRepositoryInterface,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+) : ViewModel() {
 
-    fun getActiveAlerts(): MutableLiveData<List<AlertItem>> {
-        val alertList = MutableLiveData<List<AlertItem>>()
+
+    val alertsUiState: StateFlow<AlertsUiState> =
+        repository.getActiveAlerts().asResource()
+            .map { resource ->
+                when (resource) {
+                    is Resource.Failure -> AlertsUiState.Error
+                    Resource.Loading -> AlertsUiState.Loading
+                    is Resource.Success -> {
+                        val alerts = (resource.data)
+                        if (alerts.isEmpty()) AlertsUiState.Empty else AlertsUiState.Success(alerts)
+                    }
+                }
+            }.stateIn(
+                scope = viewModelScope,
+                initialValue = AlertsUiState.Loading,
+                started = SharingStarted.WhileSubscribed(5000)
+            )
+
+
+    private val _weatherAlerts: MutableStateFlow<MutableList<NotificationAlert>> =
+        MutableStateFlow(mutableListOf())
+    val weatherAlerts: StateFlow<List<NotificationAlert>> = _weatherAlerts.asStateFlow()
+
+
+    fun addAlert(alert: Alert) =
+        viewModelScope.launch(dispatcher) {
+            repository.addNewAlert(alert)
+            checkForAlerts(alert)
+        }
+
+    private fun checkForAlerts(alert: Alert) {
         viewModelScope.launch {
-            repository.getActiveAlerts().catch { e ->
-                Log.i(TAG, "getActiveAlerts: ${e.message}")
-            }.collect {
-                alertList.postValue(it.filter { item ->
-                    item.start > System.currentTimeMillis()
-                })
-                it.filter { item ->
-                    item.start <= System.currentTimeMillis()
-                }.forEach { passedItem ->
-                    repository.deleteAlert(passedItem)
+            repository.checkForAlerts(alert.lat, alert.lon).asResource().map { resource ->
+                when (resource) {
+                    is Resource.Failure -> {
+                        Log.e(TAG, "checkForAlerts failed: ${resource.error?.message}")
+                    }
+
+                    Resource.Loading -> {}
+
+                    is Resource.Success<*> -> {
+                        val notificationAlert =
+                            resource.data as NotificationAlert
+
+                        if (notificationAlert.isMatchingWith(0, 0)) {
+                            _weatherAlerts.value.add(
+                                notificationAlert.copy(id = alert.id, type = alert.type)
+                            )
+                        } else {
+                            Log.i(TAG, "checkForAlerts: NO matching Alerts")
+                        }
+
+                    }
                 }
             }
         }
-        return alertList
     }
 
-    fun getAlertById(alertId: Long): MutableLiveData<AlertItem> {
-        val alertItem = MutableLiveData<AlertItem>()
-        viewModelScope.launch {
-            repository.getAlertById(alertId).catch { e ->
-                Log.i(TAG, "getAlertById: ${e.message}")
-            }.collect {
-                alertItem.value = it
-            }
+
+    fun removeAlert(alert: Alert) =
+        viewModelScope.launch(dispatcher) {
+            repository.deleteAlert(alert)
         }
-        return alertItem
+
+    companion object {
+        private val TAG = WeatherAlertsViewModel::class.java.simpleName
     }
-
-    fun addAlert(alert: AlertItem): MutableLiveData<Boolean> {
-        val status = MutableLiveData<Boolean>()
-        viewModelScope.launch(Dispatchers.IO) {
-            val st = repository.addNewAlert(alert)
-            withContext(Dispatchers.Main) {
-                status.value = st > 0
-            }
-        }
-        return status
-    }
-
-    fun removeAlert(alert: AlertItem): MutableLiveData<Boolean> {
-        val status = MutableLiveData<Boolean>()
-        viewModelScope.launch(Dispatchers.IO) {
-            val st = repository.deleteAlert(alert)
-            withContext(Dispatchers.Main) {
-
-                status.value = st > 0
-            }
-        }
-        return status
-    }
-
-    fun getWeatherAlerts(lat: Double, lon: Double) {
-        viewModelScope.launch {
-            repository.getWeatherAlerts(lat, lon).catch { e ->
-                _weatherAlertsStateFlow.value = ApiState.Failure(e)
-                Log.i(TAG, "getWeatherAlerts: ${e.message}")
-            }.collect {
-                _weatherAlertsStateFlow.value = ApiState.Success(it)
-            }
-        }
-    }
-
 }

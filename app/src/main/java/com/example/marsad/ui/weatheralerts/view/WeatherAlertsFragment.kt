@@ -2,77 +2,83 @@ package com.example.marsad.ui.weatheralerts.view
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
-import android.os.Build.VERSION
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.marsad.R
+import com.example.marsad.core.notifications.AlarmHelper
+import com.example.marsad.core.utils.showSnackbar
+import com.example.marsad.core.utils.viewModelFactory
+import com.example.marsad.core.utils.visibleIf
 import com.example.marsad.data.database.localdatasources.AlertLocalDataSource
-import com.example.marsad.data.model.AlertItem
-import com.example.marsad.data.network.AlertResponse
-import com.example.marsad.data.network.ApiState
-import com.example.marsad.data.network.WeatherRemoteDataSource
+import com.example.marsad.data.network.remotesource.WeatherRemoteDataSource
 import com.example.marsad.data.repositories.AlertsRepository
 import com.example.marsad.databinding.FragmentWeatherAlertsBinding
-import com.example.marsad.utils.MyViewModelFactory
-import com.example.marsad.utils.getDateAndTime
-import com.example.marsad.utils.AlertReceiver
+import com.example.marsad.domain.models.Alert
 import com.example.marsad.ui.weatheralerts.viewmodel.WeatherAlertsViewModel
-import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class WeatherAlertsFragment : Fragment() {
     lateinit var binding: FragmentWeatherAlertsBinding
-    lateinit var alertItemAdapter: AlertItemAdapter
-    private var alarmManager: AlarmManager? = null
-    private val viewModel by lazy {
-        val factory = MyViewModelFactory(
-            AlertsRepository.getInstance(
-                WeatherRemoteDataSource,
-                AlertLocalDataSource(requireContext())
-            )
+    private val alarmHelper: AlarmHelper by lazy {
+        AlarmHelper(
+            requireContext(),
+            requireActivity().getSystemService(Context.ALARM_SERVICE) as AlarmManager
         )
-        ViewModelProvider(requireActivity(), factory)[WeatherAlertsViewModel::class.java]
+    }
+
+    private val viewModel: WeatherAlertsViewModel by viewModels(ownerProducer = { requireActivity() }) {
+        viewModelFactory {
+            WeatherAlertsViewModel(
+                repository = AlertsRepository.getInstance(
+                    WeatherRemoteDataSource, AlertLocalDataSource(requireContext())
+                )
+            )
+        }
+    }
+    private val alertItemAdapter: AlertItemAdapter by lazy {
+        AlertItemAdapter(listOf())
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentWeatherAlertsBinding.inflate(inflater, container, false)
-        alarmManager =
-            requireContext().getSystemService(Context.ALARM_SERVICE) as? AlarmManager?
         return binding.root
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setUpAdapter()
-        getActiveAlerts()
-        collectAlertsResponse()
 
+        binding.activeAlertsRv.adapter = alertItemAdapter
         binding.addNewAlertFab.setOnClickListener {
             requestBatteryOptimizationPermission()
             showBottomSheet()
         }
 
-        setSwipeBehaviour()
+        getActiveAlerts()
+
+        setSwipeBehaviour(
+            onSwipe = {
+                viewModel.removeAlert(it)
+                alarmHelper.cancelAlert(it.id)
+            },
+            onUndo = viewModel::addAlert
+        )
 
     }
 
@@ -90,143 +96,72 @@ class WeatherAlertsFragment : Fragment() {
         }
     }
 
-    private fun setSwipeBehaviour() {
+    private fun setSwipeBehaviour(
+        onSwipe: (Alert) -> Unit,
+        onUndo: (Alert) -> Unit,
+    ) {
         val itemTouchHelperCallback = AlertItemTouchHelperCallback(
             requireContext(), alertItemAdapter
         ) { swipedAlert ->
-            performSwiping(swipedAlert)
+            onSwipe(swipedAlert)
+            showSnackbar(
+                msg = R.string.item_deleted,
+                actionLabel = R.string.undo,
+                action = { onUndo(swipedAlert) })
         }
         ItemTouchHelper(itemTouchHelperCallback).apply {
             attachToRecyclerView(binding.activeAlertsRv)
         }
     }
 
-    private fun performSwiping(swipedAlert: AlertItem) {
-        swipedAlert.pendingIntent?.let {
-            alarmManager?.cancel(it)
-            Toast.makeText(requireContext(), "Alert Cancelled", Toast.LENGTH_SHORT).show()
-        }
-        viewModel.removeAlert(swipedAlert)
-        Snackbar.make(
-            binding.activeAlertsRv, "Alert Deleted", Snackbar.LENGTH_LONG
-        ).setAction("Undo") {
-            viewModel.addAlert(swipedAlert)
-        }.show()
-    }
-
 
     private fun getActiveAlerts() {
-        viewModel.getActiveAlerts().observe(requireActivity()) {
-            view?.findViewById<View>(R.id.no_alerts_view)?.apply {
-                if (it.isEmpty()) {
-                    visibility = View.VISIBLE
-                } else {
-                    alertItemAdapter.alertItemList = it
-                    visibility = View.GONE
+        lifecycleScope.launch {
+            viewModel.alertsUiState.collectLatest { alertsUiState ->
+                binding.noAlertsView.root visibleIf (alertsUiState is AlertsUiState.Empty)
+                //TODO Add loading spinner
+                //binding.loading visibleIf (alertsUiState is AlertsUiState.Loading)
+                when (alertsUiState) {
+
+                    is AlertsUiState.Error -> showSnackbar(R.string.error_getting_data)
+
+                    is AlertsUiState.Success -> {
+                        alertItemAdapter.alertItemList =
+                            alertsUiState.alerts
+                    }
+
+                    else -> {}
                 }
             }
-        }
-    }
-
-
-    private fun setUpAdapter() {
-        alertItemAdapter = AlertItemAdapter(listOf(), requireContext())
-        binding.activeAlertsRv.apply {
-            adapter = alertItemAdapter
-            layoutManager = LinearLayoutManager(requireContext()).apply {
-                orientation = RecyclerView.VERTICAL
-            }
-
         }
     }
 
 
     private fun showBottomSheet() {
-        val addNewAlertBottomSheet = AddNewAlertBottomSheet()
-        addNewAlertBottomSheet.show(
+        val newAlertBottomSheet = NewAlertBottomSheet(onSave = viewModel::addAlert)
+        newAlertBottomSheet.show(
             requireActivity().supportFragmentManager,
-            AddNewAlertBottomSheet.TAG
+            NewAlertBottomSheet.TAG
         )
-
     }
 
-    private fun collectAlertsResponse() {
+    override fun onResume() {
+        super.onResume()
+        startObservingAlerts()
+    }
+
+    private fun startObservingAlerts() {
         lifecycleScope.launch {
-            viewModel.weatherAlertsStateFlow.collect { result ->
-                when (result) {
-                    is ApiState.Success<*> -> {
-                        val response = result.weatherStatus as AlertResponse
-                        alertItemAdapter.alertItemList.forEach {
-                            it.event = getString(R.string.no_alerts_msg)
-                            it.description = getString(R.string.no_alerts_description)
-                            response.alerts?.let { alerts ->
-                                if (alerts.isNotEmpty()) {
-                                    if (alertsExist(
-                                            apiStart = alerts[0].start,
-                                            apiEnd = alerts[0].end,
-                                            localStart = it.start,
-                                            localEnd = it.end
-                                        )
-                                    ) {
-                                        it.event = alerts[0].event
-                                        it.description = alerts[0].description
-                                    }
-                                }
-                            }
-                            scheduleAlarm(it)
-                        }
-                    }
-                    is ApiState.Loading -> {}
-                    else -> {
-                        Toast.makeText(
-                            requireContext(),
-                            "Failed To Fetch Alerts $result",
-                            Toast.LENGTH_SHORT
-                        )
-                            .show()
-                    }
+            viewModel.weatherAlerts.collectLatest { alerts ->
+                Log.i(TAG, "collectAlertsResponse: $alerts")
+                alerts.forEach {
+                    alarmHelper.scheduleAlert(it)
                 }
             }
         }
     }
 
-    private fun scheduleAlarm(alertItem: AlertItem) {
-        val alarmIntent =
-            Intent(requireActivity().applicationContext, AlertReceiver::class.java).apply {
-                putExtra(getString(R.string.alert_id_key), alertItem.id)
-                putExtra(getString(R.string.alert_title_key), alertItem.event)
-                putExtra(getString(R.string.alert_description_key), alertItem.description)
-                putExtra(getString(R.string.alert_type_key), alertItem.alertType)
-            }
-        val pendingIntentFlag = when (VERSION.SDK_INT) {
-            Build.VERSION_CODES.TIRAMISU -> PendingIntent.FLAG_IMMUTABLE
-            else -> PendingIntent.FLAG_UPDATE_CURRENT
-        }
-        val pendingIntent = PendingIntent.getBroadcast(
-            requireActivity().applicationContext, 1, alarmIntent, pendingIntentFlag
-        )
-        alertItem.pendingIntent = pendingIntent
-        alarmManager?.set(
-            AlarmManager.RTC_WAKEUP,
-            alertItem.start,
-            pendingIntent
-        )
-        Toast.makeText(
-            requireContext(),
-            "${getString(R.string.alert_scheduled)} \n${getDateAndTime(alertItem.start / 1000)}",
-            Toast.LENGTH_LONG
-        ).show()
-
+    companion object {
+        private val TAG = WeatherAlertsFragment::class.java.simpleName
     }
-
-    private fun alertsExist(
-        apiStart: Long,
-        apiEnd: Long,
-        localStart: Long,
-        localEnd: Long
-    ): Boolean {
-        return (localStart in apiStart..apiEnd || localEnd in apiStart..apiEnd)
-    }
-
 }
-

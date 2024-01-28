@@ -1,54 +1,42 @@
 package com.example.marsad.data.repositories
 
-import com.example.marsad.data.database.localdatasources.LocalSource
-import com.example.marsad.data.model.SavedLocation
-import com.example.marsad.data.network.WeatherDetailsResponse
-import com.example.marsad.data.network.RemoteSource
+import com.example.marsad.data.database.entities.LocationEntity
+import com.example.marsad.data.mappers.toFavoriteLocation
+import com.example.marsad.data.mappers.toLocationEntity
+import com.example.marsad.domain.datasources.LocationLocalDataSourceInterface
+import com.example.marsad.domain.models.FavoriteLocation
+import com.example.marsad.domain.repositories.LocationRepositoryInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import retrofit2.Response
+import kotlinx.coroutines.flow.map
 
 class LocationRepository private constructor(
-    private val remoteSource: RemoteSource,
-    private val localSource: LocalSource<SavedLocation>
+    private val localSource: LocationLocalDataSourceInterface,
 ) : LocationRepositoryInterface {
 
     companion object {
         private var instance: LocationRepository? = null
         fun getInstance(
-            remoteSource: RemoteSource, localSource: LocalSource<SavedLocation>
+            localSource: LocationLocalDataSourceInterface,
         ): LocationRepository {
             if (instance == null) {
-                instance = LocationRepository(remoteSource, localSource)
+                instance = LocationRepository(localSource)
             }
             return instance as LocationRepository
         }
     }
 
+    override fun getSavedLocations(): Flow<List<FavoriteLocation>> =
+        localSource.getAllItems().map { locationEntities ->
+            locationEntities.map(LocationEntity::toFavoriteLocation)
+        }.flowOn(Dispatchers.IO)
 
-    override suspend fun getLocationWeather(lat: Double, lon: Double) = flow {
-        emit(
-            remoteSource.getLocationWeather(lat, lon).body()
-        )
-    }.flowOn(Dispatchers.IO)
 
-    override fun getSavedLocations() = localSource.getAllItems().flowOn(Dispatchers.IO)
+    override suspend fun addLocation(savedLocation: FavoriteLocation) =
+        localSource.addNewItem(savedLocation.toLocationEntity())
 
-    override suspend fun addLocation(savedLocation: SavedLocation) =
-        localSource.addNewItem(savedLocation)
+    override suspend fun deleteLocation(savedLocation: FavoriteLocation) =
+        localSource.deleteItem(savedLocation.toLocationEntity())
 
-    override suspend fun deleteLocation(savedLocation: SavedLocation) =
-        localSource.deleteItem(savedLocation)
-
-    override suspend fun getWeatherDetails(
-        lat: Double,
-        lon: Double,
-        forceUpdate: Boolean
-    ): Flow<WeatherDetailsResponse> = flow {
-        emit(
-            remoteSource.getWeatherStatus(lat, lon).body()
-        )
-    }.flowOn(Dispatchers.IO) as Flow<WeatherDetailsResponse>
 }

@@ -1,86 +1,94 @@
 package com.example.marsad.data.repositories
 
+import com.example.marsad.data.database.entities.LocationEntity
 import com.example.marsad.data.database.localdatasources.FakeLocationLocalDataSource
-import com.example.marsad.data.model.SavedLocation
-import com.example.marsad.data.network.FakeWeatherRemoteDataSource
-import com.example.marsad.data.network.WeatherDetailsResponse
-import com.example.marsad.data.network.OpenWeatherMapResponse
+import com.example.marsad.data.mappers.toFavoriteLocation
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.hamcrest.CoreMatchers.not
-import org.hamcrest.CoreMatchers.nullValue
-import org.junit.Assert.*
-
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
 class LocationRepositoryTest {
-    private lateinit var repository: LocationRepository
-    private lateinit var fakeWeatherRemoteDataSource: FakeWeatherRemoteDataSource
-    private lateinit var fakeLocationLocalDataSource: FakeLocationLocalDataSource
-    private var locationsList = FakeLocationLocalDataSource.savedLocations
 
-
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val testScope = TestScope(UnconfinedTestDispatcher())
+    private lateinit var subject: LocationRepository
+    private lateinit var locationLocalDataSource: FakeLocationLocalDataSource
 
 
     @Before
     fun setUp() {
-        fakeWeatherRemoteDataSource = FakeWeatherRemoteDataSource()
-        fakeLocationLocalDataSource = FakeLocationLocalDataSource()
-        repository =
-            LocationRepository.getInstance(fakeWeatherRemoteDataSource, fakeLocationLocalDataSource)
+        locationLocalDataSource = FakeLocationLocalDataSource()
+        subject =
+            LocationRepository.getInstance(locationLocalDataSource)
     }
 
     @Test
-    fun getSavedLocations_savedLocations() {
-        //Given empty locationList
-        var savedLocations = listOf<SavedLocation>()
-        //When request saved Locations
+    fun locationRepository_saved_locations_stream_is_backed_by_location_local_data_source() {
+
         runTest {
-            repository.getSavedLocations().collect {
-                savedLocations = it
-            }
-            //Then get local source stored locations
-            assertEquals(locationsList, savedLocations)
+            assertEquals(
+                locationLocalDataSource.getAllItems().first()
+                    .map(LocationEntity::toFavoriteLocation),
+                subject.getSavedLocations().first()
+            )
         }
 
     }
 
     @Test
-    fun addNewLocation_newLocation_localListIncrementedByOne() {
-        //Given savedLocationItem old savedLocationList size
+    fun locationRepository_add_new_location_location_list_updated() {
+        //Given savedLocationItem and old savedLocationList size
         val savedLocation =
-            SavedLocation("Washington", 88.0, 33.0, 8, "google.com", "rainy")
-        val oldSize = locationsList.size
-        //When adding to local list
+            LocationEntity(-33.8688, 151.2093, "Sydney", "Australia", 78, "rain", "Rainy")
         runTest {
-            val newSize = repository.addLocation(savedLocation).toInt()
-            assertEquals(oldSize + 1, newSize)
-        }
-    }
-
-    @Test
-    fun deleteLocation_existingLocation_localListDecrementedByOne() {
-        //Given savedLocationItem old savedLocationList size
-        val savedLocation =
-            SavedLocation("Cairo", 30.0, 60.0, 36, "google.com", "rainy")
-        val oldSize = locationsList.size
-        //When deleting from  local list
-        runTest {
-            val newSize = repository.deleteLocation(savedLocation)
-            assertEquals(oldSize - 1, newSize)
+            val oldSize = locationLocalDataSource.getAllItems().first().size
+            //When adding to local list
+            subject.addLocation(savedLocation.toFavoriteLocation())
+            assertEquals(
+                oldSize.inc(),
+                locationLocalDataSource.getAllItems().first().size
+            )
+            assertTrue(
+                subject.getSavedLocations().first().contains(savedLocation.toFavoriteLocation())
+            )
         }
     }
 
 
     @Test
-    fun getLocationWeather_locationLatAndLon_openWeatherMapResponseNotnull() {
-        var response: OpenWeatherMapResponse? = null
-        runTest {
-            repository.getLocationWeather(30.0, 50.0).collect {
-                response = it
-            }
-            assertThat(response, not(nullValue()))
-        }
+    fun locationRepository_remove_existing_location_location_list_updated() {
 
+        testScope.runTest {
+
+            val oldSize = locationLocalDataSource.getAllItems().first().size
+            val lastLocation =
+                locationLocalDataSource.getAllItems().first().last().toFavoriteLocation()
+            subject.deleteLocation(
+                lastLocation
+            )
+            assertEquals(oldSize.dec(), locationLocalDataSource.getAllItems().first().size)
+            assertFalse(subject.getSavedLocations().first().contains(lastLocation))
+        }
     }
+
+    @Test
+    fun locationRepository_remove_existing_location_location_is_null() {
+
+        testScope.runTest {
+            val lastLocation = locationLocalDataSource.getAllItems().first().last()
+            subject.deleteLocation(lastLocation.toFavoriteLocation())
+
+            assertNull(locationLocalDataSource.getAllItems().first().find { it == lastLocation })
+        }
+    }
+
+
 }

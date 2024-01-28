@@ -1,52 +1,61 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="8dp">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    tools:background="@color/md_theme_light_primary">
 
 
     <ImageView
         android:id="@+id/prob_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center|start"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
-        android:src="@drawable/ic_map_24"
-        app:layout_constraintEnd_toStartOf="@+id/prob_name"
-        app:layout_constraintHorizontal_bias="0.5"
+        android:layout_margin="8dp"
+        android:contentDescription="@string/clouds"
+        android:padding="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5"
+        tools:src="@drawable/ic_cloud_24" />
 
     <TextView
         android:id="@+id/prob_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center|start"
-        android:text="prob Name"
         android:textAllCaps="true"
         android:textColor="@color/md_theme_light_onPrimary"
         android:textStyle="bold"
-        app:layout_constraintBaseline_toBaselineOf="@+id/prob_value"
-        app:layout_constraintEnd_toStartOf="@+id/prob_value"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/prob_icon" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/prob_icon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5"
+        tools:text="Title" />
 
     <TextView
         android:id="@+id/prob_value"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center|end"
-        android:padding="8dp"
-        android:text="prob value"
-        android:textAlignment="textEnd"
+        android:textAlignment="center"
         android:textColor="@color/md_theme_light_onPrimary"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/guideline2"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/prob_name"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@id/prob_name"
+        app:layout_constraintTop_toBottomOf="@id/prob_icon"
+        tools:text="Value" />
+
+    <TextView
+        android:id="@+id/prob_symbol"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:textAlignment="center"
+        android:textColor="@color/md_theme_light_onPrimary"
+        android:textSize="16sp"
+        app:layout_constraintBaseline_toBaselineOf="@id/prob_value"
+        app:layout_constraintStart_toEndOf="@id/prob_value"
+        app:layout_constraintTop_toBottomOf="@+id/prob_name"
+        tools:text="symbol" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
@@ -54,13 +63,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.04" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.9659367" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

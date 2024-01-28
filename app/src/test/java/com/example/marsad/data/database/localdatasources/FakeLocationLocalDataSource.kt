@@ -1,38 +1,41 @@
 package com.example.marsad.data.database.localdatasources
 
-import com.example.marsad.data.model.SavedLocation
+import com.example.marsad.data.database.entities.LocationEntity
+import com.example.marsad.domain.datasources.LocationLocalDataSourceInterface
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
-class FakeLocationLocalDataSource : LocalSource<SavedLocation> {
-    companion object{
+class FakeLocationLocalDataSource : LocationLocalDataSourceInterface {
 
-        val savedLocations = mutableListOf(
-            SavedLocation("Cairo", 30.0, 60.0, 36, "google.com", "rainy"),
-            SavedLocation("London", 30.0, 60.0, 36, "google.com", "rainy"),
-            SavedLocation("Fayoum", 30.0, 60.0, 36, "google.com", "rainy"),
-            SavedLocation("Paris", 30.0, 60.0, 36, "google.com", "rainy"),
-            SavedLocation("Moscow", 30.0, 60.0, 36, "google.com", "rainy"),
-            SavedLocation("Vienna", 30.0, 60.0, 36, "google.com", "rainy"),
-            SavedLocation("Tokyo", 30.0, 60.0, 36, "google.com", "rainy"),
+    private var locationEntitiesStateFlow = MutableStateFlow(
+        listOf(
+            LocationEntity(51.5074, -0.1278, "London", "United Kingdom", 55, "cloudy", "Cloudy"),
+            LocationEntity(35.6895, 139.6917, "Tokyo", "Japan", 60, "snow", "Snowy"),
+            LocationEntity(-22.9068, -43.1729, "Rio de Janeiro", "Brazil", 82, "fog", "Foggy"),
+            LocationEntity(55.7558, 37.6176, "Moscow", "Russia", 25, "wind", "Windy"),
+            LocationEntity(40.4168, -3.7038, "Madrid", "Spain", 75, "hail", "Hailstorm"),
         )
+    )
+
+
+    override fun getAllItems(): Flow<List<LocationEntity>> =
+        locationEntitiesStateFlow
+
+    override suspend fun addNewItem(item: LocationEntity): Long {
+        locationEntitiesStateFlow.update { oldValue ->
+            oldValue + item
+
+        }
+        return 1
     }
 
-    override fun getAllItems(): Flow<List<SavedLocation>> = flow {
-        emit(savedLocations)
+    override suspend fun deleteItem(item: LocationEntity): Int {
+        locationEntitiesStateFlow.update { oldValue ->
+            oldValue.dropLast(1)
+        }
+        return 1
     }
 
-    override suspend fun addNewItem(item: SavedLocation): Long {
-        savedLocations.add(item)
-        return savedLocations.size.toLong()
-    }
 
-    override suspend fun deleteItem(item: SavedLocation): Int {
-        savedLocations.remove(item)
-        return savedLocations.size
-    }
-
-    override fun getItemById(itemId: Long): Flow<SavedLocation> {
-        TODO("Not yet implemented")
-    }
 }

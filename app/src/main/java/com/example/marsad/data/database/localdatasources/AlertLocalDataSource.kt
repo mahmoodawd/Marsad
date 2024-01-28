@@ -3,23 +3,23 @@ package com.example.marsad.data.database.localdatasources
 import android.content.Context
 import com.example.marsad.data.database.AppDatabase
 import com.example.marsad.data.database.dao.AlertsDao
-import com.example.marsad.data.model.AlertItem
-import com.example.marsad.data.network.WeatherDetailsResponse
+import com.example.marsad.data.database.entities.AlertEntity
+import com.example.marsad.domain.datasources.AlertLocalDataSourceInterface
 import kotlinx.coroutines.flow.Flow
 
-class AlertLocalDataSource(val context: Context) :
-    LocalSource<AlertItem> by GeneralLocalDataSource() {
+class AlertLocalDataSource(val context: Context) : AlertLocalDataSourceInterface {
+
     private val alertsDao: AlertsDao by lazy {
         AppDatabase.getInstance(context).getAlertsDao()
     }
 
-    override fun getAllItems(): Flow<List<AlertItem>> = alertsDao.getAllAlerts()
+    override fun getItemById(itemId: Int): Flow<AlertEntity> = alertsDao.getAlertById(itemId)
+    override fun getAllItems(): Flow<List<AlertEntity>> =
+        alertsDao.getAllAlerts()
 
-    override fun getItemById(itemId: Long): Flow<AlertItem> = alertsDao.getAlertById(itemId)
+    override suspend fun addNewItem(item: AlertEntity) = alertsDao.insert(item)
 
-    override suspend fun addNewItem(item: AlertItem) = alertsDao.insert(item)
-
-    override suspend fun deleteItem(item: AlertItem) = alertsDao.delete(item)
+    override suspend fun deleteItem(item: AlertEntity) = alertsDao.delete(item)
 
 
 }
