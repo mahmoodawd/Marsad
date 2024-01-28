@@ -1,6 +1,5 @@
 package com.example.marsad.domain.repositories
 
-import com.example.marsad.data.database.entities.WeatherForecastEntity
 import com.example.marsad.domain.models.WeatherDetails
 import kotlinx.coroutines.flow.Flow
 

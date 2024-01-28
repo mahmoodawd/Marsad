@@ -1,7 +1,6 @@
 package com.example.marsad.domain.repositories
 
 
-import com.example.marsad.data.network.Resource
 import com.example.marsad.domain.models.FavoriteLocation
 import kotlinx.coroutines.flow.Flow
 
